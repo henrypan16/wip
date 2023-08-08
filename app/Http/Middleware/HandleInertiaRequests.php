@@ -5,6 +5,11 @@ namespace App\Http\Middleware;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tightenco\Ziggy\Ziggy;
+use Illuminate\Support\Facades\DB;
+use App\Models\Category;
+use App\Models\Customer;
+use App\Models\Device;
+use App\Models\Loaner;
 
 class HandleInertiaRequests extends Middleware
 {
@@ -30,6 +35,7 @@ class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
+
         return array_merge(parent::share($request), [
             'auth' => [
                 'user' => $request->user(),
@@ -39,6 +45,15 @@ class HandleInertiaRequests extends Middleware
                     'location' => $request->url(),
                 ]);
             },
+            'customers' => fn() => Customer::all(),
+            'categories' => fn() => Category::all(),
+            'allLoaners' => fn() => Loaner::select('id','name','status')
+            ->addSelect([
+                'device' => Device::select('name')
+                    ->whereColumn('device_id', 'devices.id'),
+                'category' => Category::select('name')
+                    ->whereColumn('category_id', 'categories.id')
+            ])->get(),
         ]);
     }
 }
