@@ -2,27 +2,35 @@ import { InputGroup, Col, Row, Form, Button } from 'react-bootstrap';
 import { useState } from 'react'
 
 export default function LoanerSelection({addLoaner, allLoaners}) {
-    const [isChecked, setIsChecked] = useState(false)
-    const [selectedCategory, setSelectedCategory] = useState('Please select a category');
-    const [selectedDevice, setSelectedDevice] = useState('Please select a device');
-    const [selectedLoaner, setSelectedLoaner] = useState('Please select a loaner');
+    const [all, setAll] = useState(allLoaners);
+    const [isChecked, setIsChecked] = useState(false);
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [selectedDevice, setSelectedDevice] = useState('');
+    const [selectedLoaner, setSelectedLoaner] = useState('');
     const [devices, setDevices] = useState([]);
     const [loaners, setLoaners] = useState([]);
 
     //Get list of category from all loaners
-    let categories = [...new Set(allLoaners.map(item => item.category))];
+    let categories = [...new Set(all.map(item => item.category))];
 
     //Get list of devices based on selected category
     function handleChangeCategory(e) {
-        setDevices([...new Set(allLoaners.filter(x => x.category === e.target.value).map(item => item.device))])
+        setDevices([...new Set(all.filter(x => x.category === e.target.value).map(item => item.device))])
         setSelectedCategory(e.target.value);
     }
 
     //Get list of loaners based on selected device
     function handleChangeDevice(e) {
-        setLoaners([...allLoaners.filter(x => x.device === e.target.value)])
+        setLoaners([...all.filter(x => x.device === e.target.value)])
         setSelectedDevice(e.target.value);
         console.log(loaners);
+    }
+
+    function handleClick() {
+        setLoaners(loaners.filter(x => x.id != selectedLoaner));
+        setAll(all.filter(x => x.id != selectedLoaner));
+        addLoaner(all[selectedLoaner - 1]);
+        setSelectedLoaner('');
     }
 
     return (
@@ -53,7 +61,7 @@ export default function LoanerSelection({addLoaner, allLoaners}) {
                         </option>
                     )}
                 </Form.Select>
-                <Button disabled={!isChecked} type="button" onClick={() => addLoaner(allLoaners[selectedLoaner - 1])}>+</Button>
+                <Button disabled={!isChecked || selectedLoaner == ''} type="button" onClick={handleClick}>+</Button>
             </InputGroup>
         </>
     )

@@ -1,16 +1,10 @@
 import { Link, Head } from '@inertiajs/react';
-import Button from 'react-bootstrap/Button';
-import Form from 'react-bootstrap/Form';
-import Container from 'react-bootstrap/Container'
-import Navbar from 'react-bootstrap/Navbar'
-import Nav from 'react-bootstrap/Nav';
-import InputGroup from 'react-bootstrap/InputGroup';
-import Col from 'react-bootstrap/Col';
-import Row from 'react-bootstrap/Row';
+import { Button, Form, Container, Navbar, Nav, InputGroup, Col, Row, Stack} from 'react-bootstrap';
 import { useState } from 'react';
 import { router } from '@inertiajs/react'
 import { useForm } from '@inertiajs/react'
 import LoanerSelection from './Task/LoanerSelection'
+import LoanerRemoval from './Task/LoanerRemoval'
 
 export default function Welcome({ customers, allLoaners}) {
     const [id, setId] = useState('');
@@ -45,8 +39,15 @@ export default function Welcome({ customers, allLoaners}) {
         return date.toISOString().split('T')[0]
     }
 
-    function addLoaner(a) {
-        console.log(a)
+    function addLoaner(selectedLoaner) {
+        allLoaners = allLoaners.filter(loaner => loaner.id != selectedLoaner.id);
+        console.log(allLoaners);
+        setLoaners([...loaners, selectedLoaner]);
+    }
+
+    function removeLoaner(selectedLoaner) {
+        allLoaners.push(selectedLoaner)
+        setLoaners(loaners.filter(loaner => loaner.id != selectedLoaner.id))
     }
 
     return (
@@ -114,8 +115,13 @@ export default function Welcome({ customers, allLoaners}) {
                             <option value="3">Three</option>
                         </Form.Select>
                     </Form.Group>
-
+                    
+                    
                     <LoanerSelection addLoaner={addLoaner} allLoaners={allLoaners}/>
+                    <div className="flex flex-wrap">
+                            {loaners.map((loaner) => <LoanerRemoval key={loaner.id} removeLoaner={removeLoaner} loaner={loaner}/>)}
+                    </div>
+                    
 
                     <Button variant="primary" type="submit">
                          Submit New Task
