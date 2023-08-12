@@ -8,19 +8,18 @@ import CreateTask from './Task/CreateTask'
 import Navbar from './Navbar/Navbar'
 import Sidebar from './Sidebar/Sidebar'
 import Dashboard from './Dashboard'
+import MainLayout from '../Layouts/MainLayout'
 import { initFlowbite } from 'flowbite'
 
 export default function Welcome({ customers, allLoaners}) {
     initFlowbite();
 
     return (
-        <div className="antialiased bg-gray-50 dark:bg-gray-900">
-            <Navbar/>
-        {/* Sidebar */}
-            <Sidebar/>
-
+        <>
             <Dashboard />
-            <CreateTask id="defaultModal"/>
-    </div>
+            <CreateTask id="defaultModal" customers={customers} allLoaners={allLoaners}/>
+        </>
     );
 }
+
+Welcome.layout = page => <MainLayout children={page} title="Welcome"/>
