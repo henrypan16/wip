@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
+use App\Models\Task;
+
 class TaskController extends Controller
 {
     /**
@@ -12,6 +14,7 @@ class TaskController extends Controller
      */
     public function index()
     {
+        return Inertia::render('TestPage');
         //
     }
 
@@ -29,7 +32,25 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'customer_id' => 'required',
+            'user_id' => 'required',
+            'service_order' => 'required',
+            'date' => 'required',
+            'equipment' => 'required',
+            'problem' => 'required']);
+
+        Task::create([
+            'user_id' => $request->user_id,
+            'customer_id' => $request->customer_id,
+            'date' => $request->date,
+            'equipment' => $request->equipment,
+            'problem' => $request->problem,
+            'note' => $request->note,
+            'status_id' => $request->status_id
+        ]);
+        
+        return to_route('tasks.index');
     }
 
     /**

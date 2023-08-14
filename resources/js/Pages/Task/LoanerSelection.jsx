@@ -37,11 +37,11 @@ export default function LoanerSelection({addLoaner, allLoaners}) {
     return (
         <>
             <div className="sm:col-span-2 flex justify-center items-center">
-                <input type="checkbox" checked={isChecked} onChange={() => setIsChecked(!isChecked)} aria-label="Checkbox htmlFor following text input" name="check" id="date" className="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" required=""/>
+                <input type="checkbox" checked={isChecked} onChange={() => setIsChecked(!isChecked)} aria-label="Checkbox for following text input" name="check" id="date" className="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" required=""/>
                 <label htmlFor="date" className="items-center ml-2 text-sm font-medium text-gray-900 dark:text-white">Loaner</label>
             </div>
             <div className="sm:col-span-5">
-                <select disabled={!isChecked} onChange={handleChangeCategory} value={selectedCategory} id="category" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                <select disabled={!isChecked} onChange={handleChangeCategory} value={selectedCategory} id="category" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                     <option>Select category</option>
                     {categories.map(category => 
                         <option value={category} key={category}>
@@ -51,7 +51,7 @@ export default function LoanerSelection({addLoaner, allLoaners}) {
                 </select>
             </div>
             <div  className="sm:col-span-5">
-                <select disabled={!isChecked} onChange={handleChangeDevice} value={selectedDevice} id="category" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                <select disabled={!isChecked} onChange={handleChangeDevice} value={selectedDevice} id="category" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                     <option>Please select a device</option>
                     {devices.map(device =>
                         <option value={device} key={device}>
@@ -61,7 +61,7 @@ export default function LoanerSelection({addLoaner, allLoaners}) {
                 </select>
             </div>
             <div  className="sm:col-span-4">
-                <select disabled={!isChecked} onChange={(e) => setSelectedLoaner(e.target.value)} value={selectedLoaner} id="category" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                <select disabled={!isChecked} onChange={(e) => setSelectedLoaner(e.target.value)} value={selectedLoaner} id="category" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
                     <option>Select loaner</option>
                     {loaners.map(loaner =>
                         <option value={loaner.id} key={loaner.id}>
