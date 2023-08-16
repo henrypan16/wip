@@ -24,7 +24,7 @@ export default function MainLayout({ children }) {
 
 
   return (
-    <div className={`antialiased bg-gray-50 dark:bg-gray-900`}>
+    <div className='antialiased bg-gray-50 dark:bg-gray-900'>
         <nav className="bg-white border-b border-gray-200 px-4 py-2.5 dark:bg-gray-800 dark:border-gray-700 fixed left-0 right-0 top-0 z-50">
             <div className="flex flex-wrap justify-between items-center">
                 <div className="flex justify-start items-center">
@@ -62,7 +62,7 @@ export default function MainLayout({ children }) {
                     </svg>
                     <span className="sr-only">Toggle sidebar</span>
                 </button>
-                <a href="#" className="flex items-center justify-between mr-4">
+                <a href="/dashboard" className="flex items-center justify-between mr-4">
                     <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">FT-WIP</span>
                 </a>
                 <form action="#" method="GET" className="hidden md:block md:pl-2">
@@ -1077,7 +1077,7 @@ export default function MainLayout({ children }) {
             </ul>
         </div>
 
-        <div className="hidden absolute bottom-0 left-0 justify-center p-4 space-x-4 w-full lg:flex bg-white dark:bg-gray-800 z-20">
+        <div className="absolute sm:bottom-0 bottom-16 left-0 justify-center p-4 space-x-4 w-full flex bg-white dark:bg-gray-800 z-20">
             <label className="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" onClick={handleChangeTheme} className="sr-only peer" defaultChecked={darkMode}/>
                 <div className="w-14 h-7 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>

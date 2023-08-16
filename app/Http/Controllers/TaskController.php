@@ -11,6 +11,8 @@ use App\Models\Customer;
 use App\Models\Loaner;
 use App\Models\Device;
 use App\Models\Category;
+use App\Models\Status;
+use App\Models\User;
 
 class TaskController extends Controller
 {
@@ -85,6 +87,7 @@ class TaskController extends Controller
      */
     public function show(string $id)
     {
+
         //
     }
 
@@ -92,7 +95,22 @@ class TaskController extends Controller
      * Show the form for editing the specified resource.
      */
     public function edit(string $id)
-    {
+    {   
+        $status = Status::all();
+        $task = Task::select('id', 'title', 'date', 'problem', 'service_order', 'note', 'equipment')
+                    ->addSelect([
+                        'user' => User::select('name')->whereColumn('user_id', 'users.id'),
+                        'customer_id' => Customer::select('id')->whereColumn('customer_id', 'customers.id'),
+                        'customer' => Customer::select('name')->whereColumn('customer_id', 'customers.id'),
+                        'status_id' => Status::select('id')->whereColumn('status_id', 'status.id')
+                    ])
+                    ->where('id', $id)
+                    ->first();
+
+        return Inertia::render('Task/UpdateTask', [
+            'task' => $task,
+            'status' => $status
+        ]);
         //
     }
 
@@ -101,6 +119,21 @@ class TaskController extends Controller
      */
     public function update(Request $request, string $id)
     {
+        $request->validate([
+            'title' => 'required',
+            'equipment' => 'required',
+            'problem' => 'required']);
+
+        $task = Task::where('id', $id)
+            ->update([
+                'title' => $request->title,
+                'equipment' => $request->equipment,
+                'problem' => $request->problem,
+                'note' => $request->note,
+                'status_id' => $request->status_id
+            ]);
+
+        return to_route('dashboard');   
         //
     }
 
