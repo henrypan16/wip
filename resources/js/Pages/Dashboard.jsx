@@ -48,7 +48,7 @@ export default function Dashboard({tasks}) {
                             <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                                 <div>
                                     <h3 className="text-2xl mb-3 font-bold text-gray-900 dark:text-white">
-                                        {detail.title} - SO#{detail.service_order}
+                                        {detail.type}: {detail.title} - SO#{detail.service_order}
                                     </h3>
                                     <h4 className="text-xl mb-3 text-gray-900 dark:text-white">
                                         {('000' + detail.customer_id).slice(-4)} - {detail.customer}

@@ -15,6 +15,10 @@ class Task extends Model
         return $this->belongsTo(Status::class);
     }
 
+    public function type(): BelongsTo {
+        return $this->belongsTo(Type::class);
+    }
+
     public function customer(): BelongsTo
     {
         return $this->belongsTo(Customer::class);

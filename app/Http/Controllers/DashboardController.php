@@ -8,6 +8,7 @@ use App\Models\Status;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Task;
+use App\Models\Type;
 use App\Models\User;
 
 class DashboardController extends Controller
@@ -20,7 +21,8 @@ class DashboardController extends Controller
                         'user' => User::select('name')->whereColumn('user_id', 'users.id'),
                         'customer_id' => Customer::select('id')->whereColumn('customer_id', 'customers.id'),
                         'customer' => Customer::select('name')->whereColumn('customer_id', 'customers.id'),
-                        'status' => Status::select('name')->whereColumn('status_id', 'status.id')
+                        'status' => Status::select('name')->whereColumn('status_id', 'status.id'),
+                        'type' => Type::select('name')->whereColumn('type_id', 'types.id')
                     ])
                     ->where('status_id', 1)
                     ->orderBy('created_at')

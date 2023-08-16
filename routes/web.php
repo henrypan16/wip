@@ -32,7 +32,8 @@ Route::resource('/tasks', TaskController::class);
 
 Route::get('/', [DashboardController::class, 'show'])->name('dashboard');
 Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
-
+Route::get('/test1', function() {
+    return Inertia::render('Task/HPRForm');});
 // ->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {

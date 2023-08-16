@@ -8,7 +8,7 @@ import { initFlowbite } from 'flowbite'
 import Datepicker from 'flowbite-datepicker/Datepicker';
 import { format } from 'date-fns'
 
-export default function CreateTask({allLoaners, customers}) {
+export default function CreateInstallation({allLoaners, customers}) {
     useEffect(() => {
         const datepickerEl = document.getElementById('datepickerId');
         new Datepicker(datepickerEl, {
