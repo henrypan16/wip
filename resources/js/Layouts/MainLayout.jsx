@@ -2,10 +2,10 @@ import { createContext, useContext, useState, useEffect} from 'react';
 
 
 export default function MainLayout({ children }) {
-    const [darkMode, setDarkMode] = useState(localStorage.getItem('local') || false);
+    const [darkMode, setDarkMode] = useState(localStorage.getItem('local') == 'true' ? true : false);
     useEffect(() => {
-        if(localStorage.getItem('local'))
-        { document.body.classList.add('dark') }      
+        if(localStorage.getItem('local') == 'true') {
+            document.body.classList.add('dark')} 
       return () => {
       }
     }, [])
@@ -13,12 +13,12 @@ export default function MainLayout({ children }) {
     function handleChangeTheme() {
         if(darkMode) {
             document.body.classList.remove('dark');
+            localStorage.setItem('local', false);
             setDarkMode(false);
-            localStorage.setItem('local', false)
         } else {
             document.body.classList.add('dark');
+            localStorage.setItem('local', true);
             setDarkMode(true);
-            localStorage.setItem('local', true)
         }
     }
 

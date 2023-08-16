@@ -2,9 +2,11 @@
 
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -28,9 +30,7 @@ Route::get('/', function () {
 
 Route::resource('/tasks', TaskController::class);
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
 
 // ->middleware(['auth', 'verified'])->name('dashboard');
 

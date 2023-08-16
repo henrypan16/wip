@@ -2,10 +2,15 @@
 
 namespace App\Http\Controllers;
 
+
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
 use App\Models\Task;
+use App\Models\Customer;
+use App\Models\Loaner;
+use App\Models\Device;
+use App\Models\Category;
 
 class TaskController extends Controller
 {
@@ -23,8 +28,19 @@ class TaskController extends Controller
      */
     public function create()
     {
-        return Inertia::render('Task/CreateTask', []);
-        //
+        $customers = Customer::all();
+        $loaners = Loaner::select('id','name','status')
+            ->addSelect([
+                'device' => Device::select('name')
+                    ->whereColumn('device_id', 'devices.id'),
+                'category' => Category::select('name')
+                    ->whereColumn('category_id', 'categories.id')
+            ])->get();
+
+        return Inertia::render('Task/CreateTask', [
+            'customers' => $customers,
+            'allLoaners' => $loaners
+        ]);
     }
 
     /**
@@ -37,20 +53,31 @@ class TaskController extends Controller
             'user_id' => 'required',
             'service_order' => 'required',
             'date' => 'required',
+            'title' => 'required',
             'equipment' => 'required',
             'problem' => 'required']);
 
-        Task::create([
+        $task = Task::create([
             'user_id' => $request->user_id,
             'customer_id' => $request->customer_id,
             'date' => $request->date,
+            'title' => $request->title,
+            'service_order' => $request->service_order,
             'equipment' => $request->equipment,
             'problem' => $request->problem,
             'note' => $request->note,
             'status_id' => $request->status_id
         ]);
         
-        return to_route('tasks.index');
+        foreach($request->loaners as $l) {
+            echo(1);
+            $loaner = Loaner::find($l['id']);
+            $loaner->status = $request->customer_id;
+            $loaner->save();
+            $task->loaners()->attach($loaner);
+        }
+
+        return to_route('dashboard');
     }
 
     /**

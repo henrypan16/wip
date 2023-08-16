@@ -17,10 +17,3 @@ use Illuminate\Support\Facades\DB;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
-
-Route::get('/loaner', function (Request $request) 
-{
-    $id = $request->id;
-    $customer = DB::table('customers')->where('id', $id)->first();
-    return $customer;
-});
