@@ -10,8 +10,8 @@ export default defineConfig({
         }),
         react(),
     ],
-    server: {
-        host: true,
-        hmr: { host: '172.16.0.103' }
-    }
+    // server: {
+    //     host: true,
+    //     hmr: { host: '172.16.0.103' }
+    // }
 });

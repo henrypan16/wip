@@ -31,15 +31,34 @@ export default function Dashboard({tasks}) {
         {/* > */}
         
             <Head title="Dashboard" />
-            <main className="dark:bg-gray-900 p-4 md:ml-64 h-auto pt-20">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-                    
+            <main className="dark:bg-gray-900 h-screen p-4 md:ml-64 h-auto pt-20">
+                <div className="grid grid-cols-12 divide-x-2 dark:divide-gray-800">
+                    <div className="grid col-span-4 p-6">
+                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4">Repair Order</h1>
+                        {tasks.map((task) =>
+                            <TaskCard key={task.id} task={task} handleClick={handleClick}/>
+                        )}
+                    </div>
+
+                    <div className="grid col-span-4 p-6">
+                        <h1 className="text-lg text-gray-900 dark:text-white mb-4 col-span-full">3rd Party Received</h1>
+                        {tasks.map((task) =>
+                            <TaskCard key={task.id} task={task} handleClick={handleClick}/>
+                        )}
+                    </div>
+
+                    <div className="grid col-span-4 p-6">
+                        <h1 className="text-lg text-gray-900 dark:text-white mb-4">HPR</h1>
+                        {tasks.map((task) =>
+                            <TaskCard key={task.id} task={task} handleClick={handleClick}/>
+                        )}
+                    </div>
                 </div>
-                <div className="grid grid-cols-12 col-span-1">
-                    {tasks.map((task) =>
-                        <TaskCard key={task.id} task={task} handleClick={handleClick}/>
-                    )}
+                <div className="grid col-span-full m-6">
+                        <h1 className="text-lg text-gray-900 dark:text-white mb-4">Missing Loaners: </h1>
                 </div>
+
+
                 <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
                     <div className="relative w-full max-w-2xl max-h-full">
                         {/* <!-- Modal content --> */}
@@ -80,38 +99,6 @@ export default function Dashboard({tasks}) {
                             </div>
                         </div>
                     </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-4 mb-4">
-                    <div
-                    className="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"
-                    ></div>
-                    <div
-                    className="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"
-                    ></div>
-                    <div
-                    className="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"
-                    ></div>
-                    <div
-                    className="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"
-                    ></div>
-                </div>
-                <div
-                    className="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-96 mb-4"
-                ></div>
-                <div className="grid grid-cols-2 gap-4">
-                    <div
-                    className="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"
-                    ></div>
-                    <div
-                    className="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"
-                    ></div>
-                    <div
-                    className="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"
-                    ></div>
-                    <div
-                    className="border-2 border-dashed rounded-lg border-gray-300 dark:border-gray-600 h-48 md:h-72"
-                    ></div>
                 </div>
             </main>
         {/*</AuthenticatedLayout*>*/}

@@ -75,12 +75,12 @@ export default function CreateInstallation({allLoaners, customers}) {
 
   return (
     <main className={`dark:bg-gray-900 px-5 pb-80 sm:px-10 md:px-5 lg:pt-30 lg:px-32 xl:px-60 2xl:px-80 md:ml-64 h-auto pt-24`}>
-        <Head title="New Task"></Head>
+        <Head title="3rd Party Items"></Head>
         
         <form onSubmit={submit}>
             <div className="grid gap-4 mb-4 sm:grid-cols-18">
                 <div className="sm:col-span-8 mb-6 flex items-center">
-                    <span className="text-3xl text-bold dark:text-white">Create New Task</span>
+                    <span className="text-3xl text-bold dark:text-white">Receive 3rd Party Items</span>
                 </div>
                 <div className="sm:col-span-10 relative z-0 w-full mb-6 group">
                     <input value={data.title} onChange={(e) => setData('title', e.target.value)} type="text" name="title" id="title" className="block pt-6 px-2.5 w-full text-lg h-14 bg-white text-gray-900 rounded-lg dark:bg-gray-700 border-0  border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required/>
