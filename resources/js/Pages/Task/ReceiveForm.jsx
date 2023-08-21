@@ -7,31 +7,25 @@ import LoanerSelection from './LoanerSelection'
 import { initFlowbite } from 'flowbite'
 import Datepicker from 'flowbite-datepicker/Datepicker';
 import { format } from 'date-fns'
+import { FormField, FormFieldDate, FormFieldTextarea, FormFieldTitle } from '../FormComponents'
+import ReceiveItems from './ReceiveItems'
 
 export default function CreateInstallation({allLoaners, customers}) {
-    useEffect(() => {
-        const datepickerEl = document.getElementById('datepickerId');
-        new Datepicker(datepickerEl, {
-            autohide: true,
-            format: 'dd/mm/yyyy'
-        }); 
-    }, []);
-
+    const [isChecked, setIsChecked] = useState(false);
     const [all, setAll] = useState(allLoaners);
     const [pharmacy, setPharmacy] = useState('');
-    const [loaners, setLoaners] = useState([]);
     const { data, setData, post, processing, errors } = useForm({
         customer_id: '',
         user_id: 1,
-        service_order: '',
-        title: '',
-        date: String(format(new Date(), 'dd/MM/yyyy')),
-        equipment: '',
-        problem: '',
+        dropoff_date: String(format(new Date(), 'dd/MM/yyyy')),
+        inspect_date: String(format(new Date(), 'dd/MM/yyyy')),
+        contact_number: '',
+        contact_person: '',
+        dropoff_person: '',
+        equipment: [],
         note: '',
-        loaners: [],
         status_id: 1,
-        type_id: 1
+        type_id: 3
     })
 
     function handleChangeID(e) {
@@ -49,25 +43,6 @@ export default function CreateInstallation({allLoaners, customers}) {
         return;
     }
 
-    function handleChangeDate(e) {
-        let date = new Date(e.target.value);
-        setDate(date.toISOString().split('T')[0]);
-    }
-
-    function addLoaner(selectedLoaner) {
-        console.log(selectedLoaner);
-        setAll(all.filter(loaner => loaner.id != selectedLoaner.id));
-        setData('loaners', [...data.loaners, selectedLoaner]);
-    }
-
-    function removeLoaner(selectedLoaner) {
-        console.log(selectedLoaner);
-        const sorted = [...all, selectedLoaner];
-        sorted.sort((a, b) => a.id < b.id ? -1 : 1);
-        setAll(sorted);
-        setData('loaners', data.loaners.filter(loaner => loaner.id != selectedLoaner.id));
-    }
-
     function submit(e) {
         e.preventDefault();
         post('/tasks');
@@ -79,75 +54,32 @@ export default function CreateInstallation({allLoaners, customers}) {
         
         <form onSubmit={submit}>
             <div className="grid gap-4 mb-4 sm:grid-cols-18">
-                <div className="sm:col-span-8 mb-6 flex items-center">
+                <div className="sm:col-span-full mb-6 flex items-center">
                     <span className="text-3xl text-bold dark:text-white">Receive 3rd Party Items</span>
                 </div>
-                <div className="sm:col-span-10 relative z-0 w-full mb-6 group">
-                    <input value={data.title} onChange={(e) => setData('title', e.target.value)} type="text" name="title" id="title" className="block pt-6 px-2.5 w-full text-lg h-14 bg-white text-gray-900 rounded-lg dark:bg-gray-700 border-0  border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required/>
-                    <label htmlFor="title" className="z-30 peer-focus:font-medium absolute text-md text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-4 scale-75 left-2.5 top-4 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:translate-x-2">Title</label>
-                </div>
-                <div className="sm:col-span-4">
-                    <label htmlFor="customer_id" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Customer's ID</label>
-                    <input value={data.customer_id} onChange={handleChangeID} type="number" name="customer_id" id="customer_id"
-                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Customer ID" required/>
-                </div>
-                <div className="sm:col-span-6">
-                    <label htmlFor="service_order" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service Order</label>
-                    <input value={data.service_order} onChange={e => setData('service_order', e.target.value)} type="number" name="service_order" id="service_order"
-                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Service Order" required/>
-                    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.service_order}</p>
-                </div>
-                <div className="sm:col-span-8">
-                    <div className="relative">
-                        <label htmlFor="date" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date</label>
-                        <div className="absolute inset-y-0 left-0 flex items-center pl-3 pt-7 pointer-events-none">
-                            <svg className="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M20 4a2 2 0 0 0-2-2h-2V1a1 1 0 0 0-2 0v1h-3V1a1 1 0 0 0-2 0v1H6V1a1 1 0 0 0-2 0v1H2a2 2 0 0 0-2 2v2h20V4ZM0 18a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8H0v10Zm5-8h10a1 1 0 0 1 0 2H5a1 1 0 0 1 0-2Z"/>
-                            </svg>
-                        </div>
-                        <input value={data.date} onChange={(e) => {setData('date', e.target.value)}} id="datepickerId" type="text"
-                        className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full pl-10 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Select date"/>
-                    </div>
-                    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.date}</p>
-                </div>
-                <div className="sm:col-span-full">
-                    <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pharmacy's Name</label>
-                    <input value={pharmacy} disabled type="text" name="name" id="name"
-                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Pharmacy's name" required=""/>
-                    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.customer_id}</p>
-                </div>
 
-                <div className="sm:col-span-full">
-                    <label htmlFor="equipment" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Equipment</label>
-                    <input value={data.equipment} onChange={e => setData('equipment', e.target.value)} type="text" name="equipment" id="equipment"
-                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required=""/>
-                    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.equipment}</p>
-                </div>
-                <div className="sm:col-span-full">
-                    <label htmlFor="problem" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Problem</label>
-                    <input value={data.problem} onChange={e => setData('problem', e.target.value)} type="text" name="problem" id="problem"
-                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required=""/>
-                    <p className="mt-2 text-sm text-red-600 dark:text-red-500">{errors.problem}</p>
-                </div>
-                <div className="sm:col-span-full">
-                    <label htmlFor="note" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Note</label>
-                    <textarea value={data.note} onChange={e => setData('note', e.target.value)} name="note" rows="3" id="note"
-                    className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" required=""/>
+                {/* Normal FormField component, but with added checkbox on the label */}
+                <div className="sm:col-span-4">
+                    <label htmlFor="customer_id" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        <input type="checkbox" checked={isChecked} onChange={() => setIsChecked(!isChecked)} aria-label="Checkbox for following text input" name="check" id="date" className="w-4 h-4 text-blue-600 bg-white border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" required=""/>
+                        <label htmlFor="date" className="items-center ml-2 text-sm font-medium text-gray-900 dark:text-white">Prospect</label>
+                    </label>
+                    <input value={data.customer_id} onChange={handleChangeID} type="number" name="customer_id" id="customer_id" className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Customer ID" required/>
                 </div>
                 
-                <LoanerSelection addLoaner={addLoaner} allLoaners={all}/>
-                <div className="flex flex-wrap col-span-full">
-                        {data.loaners.map((loaner) =>
-                            <div key={loaner.id} className="flex justify-center items-center p-2 rounded-lg mr-3 mb-3 border bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600" controlid="Loaner">
-                                <div className="mr-2 dark:text-white">{loaner.device} #{loaner.name}</div>
-                                <button type="button" onClick={() => removeLoaner(loaner)} className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-3 py-1 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">-</button>
-                            </div>)}
-                </div>
+                <FormFieldDate id="dropoff_date" colspan="sm:col-span-6" value={data.dropoff_date} onChange={e => setData('dropoff_date', e.target.value)} placeholder="Dropoff Date"/>
+                <FormFieldDate id="inspect_date" colspan="sm:col-span-6" value={data.inspect_date} onChange={e => setData('inspect_date', e.target.value)} placeholder="Inspect Date"/>
+                <FormField onChange={()=>{}} id="name" colspan="sm:col-span-full" type="text" placeholder="Pharmacy's Name" required={true} value={pharmacy}/>
+                <FormField onChange={e => setData('dropoff_person', e.target.value)} id="dropoff_person" colspan="sm:col-span-6" type="text" placeholder="Dropoff Person" required={true} value={data.dropoff_person}/>
+                <FormField onChange={e => setData('contact_person', e.target.value)} id="contact_person" colspan="sm:col-span-6" type="text" placeholder="Contact Person" required={true} value={data.contact_person}/>
+                <FormField onChange={e => setData('contact_number', e.target.value)} id="contact_number" colspan="sm:col-span-6" type="text" placeholder="Contact Number" required={true} value={data.contact_number}/>
+                <ReceiveItems/>
+                <FormFieldTextarea onChange={e => setData('note', e.target.value)} id="note" colspan="sm:col-span-full" type="textarea" placeholder="Note" required={true} value={data.note}/>
             </div>
             <button type="submit" disabled={processing}
             className="inline-flex focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
                 <svg className="mr-1 -ml-1 w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd"></path></svg>
-                Add new task
+                Generate Log
             </button>
         </form>
     </main>

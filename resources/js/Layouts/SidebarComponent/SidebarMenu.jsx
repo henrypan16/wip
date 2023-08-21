@@ -5,7 +5,7 @@ export default function SidebarMenu({}) {
     const task = [
         { name: "Create New Task", href: "/tasks/create" },
         { name: "Return Loaner", href: "#" },
-        { name: "Receive Item", href: "#" },
+        { name: "Receive Item", href: "/receive" },
     ]
 
     const loaner = [

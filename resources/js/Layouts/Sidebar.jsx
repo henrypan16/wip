@@ -1,6 +1,4 @@
-import SidebarSearch from './SidebarSearch';
-import SidebarMenu from './SidebarMenu';
-import SidebarDarkModeButton from './SidebarDarkModeButton';
+import { SidebarSearch, SidebarMenu, SidebarDarkModeButton } from './SidebarComponent'
 
 export default function Sidebar({handleChangeTheme, darkMode}) {
     return (
@@ -12,4 +10,3 @@ export default function Sidebar({handleChangeTheme, darkMode}) {
       <SidebarDarkModeButton   handleChangeTheme={handleChangeTheme} darkMode={darkMode}  />
     </aside>)
 }
-    
