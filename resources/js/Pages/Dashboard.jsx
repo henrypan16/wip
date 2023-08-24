@@ -2,8 +2,10 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { useContext, useState, useEffect, useRef } from 'react';
 import TaskCard from './Task/TaskCard'
+import LoanerCard from './LoanerCard'
 
-export default function Dashboard({tasks}) {
+export default function Dashboard({tasks, loaners}) {
+    const mainCategory = ['Tower PC', 'Backpack PC', 'Laser Printer', 'Thermal Printer', 'Scanner'];
     const [selectedTask, setSelectedTask] = useState(0);
     const [detail, setDetail] = useState({});
     const inputElement = useRef('');
@@ -14,7 +16,7 @@ export default function Dashboard({tasks}) {
             closable: true,
         }
         inputElement.current = new Modal(modalEl, options);
-
+        console.log(loaners);
     }, []);
 
 
@@ -31,7 +33,7 @@ export default function Dashboard({tasks}) {
         {/* > */}
         
             <Head title="Dashboard" />
-            <main className="dark:bg-gray-900 h-screen p-4 md:ml-64 h-auto pt-20">
+            <main className="dark:bg-gray-900 p-4 md:ml-64 h-auto pt-20">
                 <div className="grid grid-cols-12 divide-x-2 dark:divide-gray-800">
                     <div className="grid col-span-4 p-6">
                         <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4">Repair Order</h1>
@@ -54,8 +56,18 @@ export default function Dashboard({tasks}) {
                         )}
                     </div>
                 </div>
+
+                {/* Loop through mainCategory array, in each category: loop through the number of loaner */}
+                {/* loaners.reduce is used to find the number of loaners in each category, then only render category with positive number */}
                 <div className="grid col-span-full m-6">
                         <h1 className="text-lg text-gray-900 dark:text-white mb-4">Missing Loaners: </h1>
+                        {mainCategory.map((category) => loaners.reduce((acc, cur) => cur.category === category ? ++acc : acc, 0) != 0 &&
+                            <div key={category} className="grid grid-cols-6">
+                                <h1 className="text-lg text-gray-900 dark:text-white mb-4 col-span-full ">{category}</h1>
+                                {loaners.map((loaner) => loaner.category == category &&
+                                    <LoanerCard key={loaner.id} loaner={loaner}/>)}
+                            </div>)}
+                        
                 </div>
 
 

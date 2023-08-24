@@ -33,11 +33,10 @@ class TaskController extends Controller
         $customers = Customer::all();
         $loaners = Loaner::select('id','name','status')
             ->addSelect([
-                'device' => Device::select('name')
-                    ->whereColumn('device_id', 'devices.id'),
-                'category' => Category::select('name')
-                    ->whereColumn('category_id', 'categories.id')
-            ])->get();
+                'device' => Device::select('name')->whereColumn('device_id', 'devices.id'),
+                'category' => Category::select('name')->whereColumn('category_id', 'categories.id')])
+            ->where('status', 'Available')
+            ->get();
 
         return Inertia::render('Task/CreateTask', [
             'customers' => $customers,
