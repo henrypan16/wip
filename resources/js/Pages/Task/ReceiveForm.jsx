@@ -92,8 +92,8 @@ export default function CreateInstallation({allLoaners, customers}) {
                 <FormFieldDate id="dropoff_date" colspan="sm:col-span-6" value={data.dropoff_date} onChange={e => setData('dropoff_date', e.target.value)} placeholder="Dropoff Date"/>
                 <FormFieldDate id="inspect_date" colspan="sm:col-span-6" value={data.inspect_date} onChange={e => setData('inspect_date', e.target.value)} placeholder="Inspect Date"/>
                 <FormField onChange={()=>{}} id="name" colspan="sm:col-span-full" type="text" placeholder="Pharmacy's Name" required={true} value={pharmacy}/>
-                <FormField onChange={e => setData('dropoff_person', e.target.value)} id="dropoff_person" colspan="sm:col-span-6" type="text" placeholder="Dropoff Person" required={true} value={data.dropoff_person}/>
-                <FormField onChange={e => setData('contact_person', e.target.value)} id="contact_person" colspan="sm:col-span-6" type="text" placeholder="Contact Person" required={true} value={data.contact_person}/>
+                <FormField onChange={e => setData('dropoff_person', e.target.value.toUpperCase())} id="dropoff_person" colspan="sm:col-span-6" type="text" placeholder="Dropoff Person" required={true} value={data.dropoff_person}/>
+                <FormField onChange={e => setData('contact_person', e.target.value.toUpperCase())} id="contact_person" colspan="sm:col-span-6" type="text" placeholder="Contact Person" required={true} value={data.contact_person}/>
                 <FormField onChange={e => setData('contact_number', e.target.value)} id="contact_number" colspan="sm:col-span-6" type="text" placeholder="Contact Number" required={true} value={data.contact_number}/>
                 <ReceiveItems pcList={pcList} addPc={addPc} removePc={removePc}/>
                 <FormFieldTextarea onChange={e => setData('note', e.target.value)} id="note" colspan="sm:col-span-full" type="textarea" placeholder="Note" required={true} value={data.note}/>
@@ -140,7 +140,7 @@ export default function CreateInstallation({allLoaners, customers}) {
                                 
 
                                 <p>Notes:<br/>
-                                {data.note}<br/>
+                                {data.note == '' ? <>{data.note}</> : null}
                                 {pcList.map(pc => {return pc.gpu_ports == '' ?
                                     <>
                                         **{pc.motherboard} has {pc.usb_front} USB ports at the FRONT, {pc.usb_back} USB ports at the BACK.<br/>

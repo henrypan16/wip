@@ -1,21 +1,21 @@
 import React from 'react'
 import { Link, Head } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from '@inertiajs/react'
 import LoanerSelection from './LoanerSelection'
 import { format } from 'date-fns'
-import { FormField, FormFieldDate, FormFieldTextarea, FormFieldTitle } from '../FormComponents'
+import { FormField, FormFieldDate, FormFieldTextarea, FormFieldTitle, FormFieldOption } from '../FormComponents'
 import LoanerItem from './LoanerItem'
 
-export default function CreateTask({allLoaners, customers}) {
+export default function CreateTask({allLoaners, customers, users}) {
     const [all, setAll] = useState(allLoaners);
     const [pharmacy, setPharmacy] = useState('');
     const { data, setData, post, processing, errors } = useForm({
         customer_id: '',
-        user_id: 1,
+        user_id: {},
         service_order: '',
         title: '',
-        date: String(format(new Date(), 'dd/MM/yyyy')),
+        date: '',
         equipment: '',
         problem: '',
         note: '',
@@ -23,6 +23,11 @@ export default function CreateTask({allLoaners, customers}) {
         status_id: 1,
         type_id: 1
     })
+    useEffect(() => {
+        // console.log(data);
+    })
+    
+
 
     function handleChangeID(e) {
         let newId = e.target.value;
@@ -70,7 +75,8 @@ export default function CreateTask({allLoaners, customers}) {
                 <FormFieldTitle onChange={e => setData('title', e.target.value)} placeholder="Title" value={data.title}/>
                 <FormField onChange={handleChangeID} id="customer_id" colspan="sm:col-span-4" type="number" placeholder="Customer ID" required={true} value={data.customer_id}/>
                 <FormField onChange={e => setData('service_order', e.target.value)} id="service_order" colspan="sm:col-span-6" type="number" placeholder="Service Order" required={true} value={data.service_order}/>
-                <FormFieldDate id="date" colspan="sm:col-span-8" value={data.date} onChange={e => setData('date', e.target.value)} placeholder="Receive Date"/>
+                <FormFieldDate id="date" colspan="sm:col-span-4" value={data.date} onChange={e => setData('date', e.target.value)} placeholder="Receive Date"/>
+                <FormFieldOption id="user" colspan="sm:col-span-4" value={data.user_id} onChange={e => {setData('user_id', e.target.value)}} placeholder="Technician" users={users} required={true}/>
                 <FormField onChange={()=>{}} id="name" colspan="sm:col-span-full" type="text" placeholder="Pharmacy's Name" required={true} value={pharmacy}/>
                 <FormField onChange={e => setData('equipment', e.target.value)} id="equipment" colspan="sm:col-span-full" type="text" placeholder="Equipment" required={true} value={data.equipment}/>
                 <FormField onChange={e => setData('problem', e.target.value)} id="problem" colspan="sm:col-span-full" type="text" placeholder="Problem" required={true} value={data.problem}/>

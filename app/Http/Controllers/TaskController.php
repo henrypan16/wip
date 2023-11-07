@@ -37,10 +37,12 @@ class TaskController extends Controller
                 'category' => Category::select('name')->whereColumn('category_id', 'categories.id')])
             ->where('status', 'Available')
             ->get();
-
+        $users = User::all();
+                
         return Inertia::render('Task/CreateTask', [
             'customers' => $customers,
-            'allLoaners' => $loaners
+            'allLoaners' => $loaners,
+            'users' => $users
         ]);
     }
 

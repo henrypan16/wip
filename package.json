@@ -25,6 +25,7 @@
         "eslint-config-react-app": "^7.0.1",
         "flowbite": "^1.8.1",
         "flowbite-datepicker": "^1.2.2",
-        "react-bootstrap": "^2.8.0"
+        "react-bootstrap": "^2.8.0",
+        "tailwind-datepicker-react": "^1.4.3"
     }
 }
