@@ -33,27 +33,24 @@ export default function Dashboard({tasks, loaners}) {
         {/* > */}
         
             <Head title="Dashboard" />
-            <main className="dark:bg-gray-900 p-4 md:ml-64 h-auto pt-20">
+            <main className="dark:bg-gray-900 p-4 md:ml-64 h-screen pt-20">
                 <div className="grid grid-cols-12 divide-x-2 dark:divide-gray-800">
-                    <div className="grid col-span-4 p-6">
-                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4">Repair Order</h1>
-                        {tasks.map((task) =>
-                            <TaskCard key={task.id} task={task} handleClick={handleClick}/>
-                        )}
+                    <div className="grid col-span-6 p-6 grid grid-rows-6">
+                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Repair Order</h1>
+                        <div className="h-4 row-start-2 row-end-6 grid grid-cols-3">
+                            {tasks.map((task) =>
+                                <TaskCard key={task.id} task={task} handleClick={handleClick}/>
+                            )}
+                        </div>
                     </div>
 
-                    <div className="grid col-span-4 p-6">
-                        <h1 className="text-lg text-gray-900 dark:text-white mb-4 col-span-full">3rd Party Received</h1>
-                        {tasks.map((task) =>
-                            <TaskCard key={task.id} task={task} handleClick={handleClick}/>
-                        )}
-                    </div>
-
-                    <div className="grid col-span-4 p-6">
-                        <h1 className="text-lg text-gray-900 dark:text-white mb-4">HPR</h1>
-                        {tasks.map((task) =>
-                            <TaskCard key={task.id} task={task} handleClick={handleClick}/>
-                        )}
+                    <div className="grid col-span-6 p-6 grid grid-rows-6">
+                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Prepair Order</h1>
+                        <div className="h-4 row-start-2 row-end-6 grid grid-cols-3">
+                            {tasks.map((task) =>
+                                <TaskCard key={task.id} task={task} handleClick={handleClick}/>
+                            )}
+                        </div>
                     </div>
                 </div>
 
@@ -107,7 +104,10 @@ export default function Dashboard({tasks, loaners}) {
                                 className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                                     Modify
                                 </a>
+                                <button onClick={() => inputElement.current.hide()} type="button" className=" bg-white  focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm font-medium px-5 py-2.5  focus:z-10 dark:hover:text-white text-white bg-green-700 hover:bg-green-800 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Ready</button>
+                                <button onClick={() => inputElement.current.hide()} type="button" className="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Complete</button>
                                 <button onClick={() => inputElement.current.hide()} type="button" className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Close</button>
+
                             </div>
                         </div>
                     </div>

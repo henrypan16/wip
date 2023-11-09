@@ -3,6 +3,7 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\LoanerController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -35,6 +36,7 @@ Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard'
 Route::get('/receive', function() {
     return Inertia::render('Task/ReceiveForm');});
 // ->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/loaner', [LoanerController::class, 'show'])->name('loaner');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

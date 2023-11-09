@@ -9,7 +9,7 @@ export default function SidebarMenu({}) {
     ]
 
     const loaners = [
-        { name: "View All Loaner", href: "#" },
+        { name: "View All Loaner", href: "/loaner" },
         { name: "Edit Loaner", href: "#" },
     ]
 
