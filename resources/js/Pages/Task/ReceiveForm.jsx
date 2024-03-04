@@ -71,7 +71,7 @@ export default function CreateInstallation({allLoaners, customers}) {
     }
 
   return (
-    <main className={`dark:bg-gray-900 px-5 pb-80 sm:px-10 md:px-5 lg:pt-30 lg:px-32 xl:px-60 2xl:px-80 md:ml-64 h-auto pt-24`}>
+    <main className={`dark:bg-gray-900 px-5 sm:px-10 md:px-5 lg:pt-30 lg:px-32 2xl:px-80 pt-12`}>
         <Head title="3rd Party Items"></Head>
         
         <form onSubmit={submit}>

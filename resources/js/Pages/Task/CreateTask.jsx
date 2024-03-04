@@ -8,14 +8,17 @@ import { FormField, FormFieldDate, FormFieldTextarea, FormFieldTitle, FormFieldO
 import LoanerItem from './LoanerItem'
 
 export default function CreateTask({allLoaners, customers, users}) {
+    const TODAY = format(new Date(), 'dd/MM/yyyy')
     const [all, setAll] = useState(allLoaners);
     const [pharmacy, setPharmacy] = useState('');
+    const [date, setDate] = useState(TODAY);
     const { data, setData, post, processing, errors } = useForm({
         customer_id: '',
-        user_id: {},
+        customer_name: '',
+        user_id: 1,
         service_order: '',
         title: '',
-        date: '',
+        date: TODAY,
         equipment: '',
         problem: '',
         note: '',
@@ -23,26 +26,25 @@ export default function CreateTask({allLoaners, customers, users}) {
         status_id: 1,
         type_id: 1
     })
-    useEffect(() => {
-        // console.log(data);
-    })
     
+    useEffect(() => {
+        setData('date', date)
+    },[date])
 
-
-    function handleChangeID(e) {
-        let newId = e.target.value;
-        if(newId < 1) {
-            setData('customer_id', '');
-            setPharmacy('');
-        } else if(newId > customers.length) {
-            setData('customer_id', customers.length)
-            setPharmacy(customers[customers.length-1].name);
-        } else {
-            setData('customer_id', newId);
-            setPharmacy(customers[newId-1].name);
-        }
-        return;
-    }
+    // function handleChangeID(e) {
+    //     let newId = e.target.value;
+    //     if(newId < 1) {
+    //         setData('customer_id', '');
+    //         setPharmacy('');
+    //     } else if(newId > customers.length) {
+    //         setData('customer_id', customers.length)
+    //         setPharmacy(customers[customers.length-1].name);
+    //     } else {
+    //         setData('customer_id', newId);
+    //         setPharmacy(customers[newId-1].name);
+    //     }
+    //     return;
+    // }
 
     function addLoaner(selectedLoaner) {
         console.log(selectedLoaner);
@@ -64,7 +66,7 @@ export default function CreateTask({allLoaners, customers, users}) {
     }
 
   return (
-    <main className="dark:bg-gray-900 px-5 pb-80 sm:px-10 md:px-5 lg:pt-30 lg:px-32 xl:px-60 2xl:px-80 md:ml-64 h-auto pt-24">
+    <div className="dark:bg-gray-900 px-5 sm:px-10 md:px-5 lg:pt-30 lg:px-32 2xl:px-80 pt-12">
         <Head title="New Task"></Head>
         
         <form onSubmit={submit}>
@@ -73,11 +75,11 @@ export default function CreateTask({allLoaners, customers, users}) {
                     <span className="text-3xl text-bold dark:text-white">Create New Task</span>
                 </div>
                 <FormFieldTitle onChange={e => setData('title', e.target.value)} placeholder="Title" value={data.title}/>
-                <FormField onChange={handleChangeID} id="customer_id" colspan="sm:col-span-4" type="number" placeholder="Customer ID" required={true} value={data.customer_id}/>
-                <FormField onChange={e => setData('service_order', e.target.value)} id="service_order" colspan="sm:col-span-6" type="number" placeholder="Service Order" required={true} value={data.service_order}/>
-                <FormFieldDate id="date" colspan="sm:col-span-4" value={data.date} onChange={e => setData('date', e.target.value)} placeholder="Receive Date"/>
-                <FormFieldOption id="user" colspan="sm:col-span-4" value={data.user_id} onChange={e => {setData('user_id', e.target.value)}} placeholder="Technician" users={users} required={true}/>
-                <FormField onChange={()=>{}} id="name" colspan="sm:col-span-full" type="text" placeholder="Pharmacy's Name" required={true} value={pharmacy}/>
+                <FormField onChange={e => setData('customer_id', ('000' + e.target.value).slice(-4))} id="customer_id" colspan="sm:col-span-4" type="number" placeholder="Customer ID" required={true} value={data.customer_id}/>
+                <FormField onChange={e => setData('service_order', ('00000' + e.target.value).slice(-6))} id="service_order" colspan="sm:col-span-6" type="number" placeholder="Service Order" required={true} value={data.service_order}/>
+                <FormFieldDate value={date} id="date" colspan="sm:col-span-4" onChange={e => setDate(e.target.value)} placeholder="Receive Date"/>
+                <FormFieldOption id="user" colspan="sm:col-span-4" value={data.user_id} onChange={e => setData('user_id', e.target.value)} placeholder="Technician" users={users} required={true}/>
+                <FormField onChange={e => setData('customer_name', e.target.value)} id="name" colspan="sm:col-span-full" type="text" placeholder="Pharmacy's Name" required={true} value={data.customer_name}/>
                 <FormField onChange={e => setData('equipment', e.target.value)} id="equipment" colspan="sm:col-span-full" type="text" placeholder="Equipment" required={true} value={data.equipment}/>
                 <FormField onChange={e => setData('problem', e.target.value)} id="problem" colspan="sm:col-span-full" type="text" placeholder="Problem" required={true} value={data.problem}/>
                 <FormFieldTextarea onChange={e => setData('note', e.target.value)} id="note" colspan="sm:col-span-full" type="textarea" placeholder="Note" required={true} value={data.note} row={3}/>                
@@ -93,7 +95,7 @@ export default function CreateTask({allLoaners, customers, users}) {
                 Add new task
             </button>
         </form>
-    </main>
+    </div>
 )}
 
 

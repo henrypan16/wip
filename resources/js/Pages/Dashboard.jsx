@@ -1,5 +1,6 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
+import { useForm } from '@inertiajs/react'
 import { useContext, useState, useEffect, useRef } from 'react';
 import TaskCard from './Task/TaskCard'
 import LoanerCard from './LoanerCard'
@@ -8,21 +9,36 @@ export default function Dashboard({tasks, loaners}) {
     const mainCategory = ['Tower PC', 'Backpack PC', 'Laser Printer', 'Thermal Printer', 'Scanner'];
     const [selectedTask, setSelectedTask] = useState(0);
     const [detail, setDetail] = useState({});
+    const { data, setData, patch } = useForm({
+        status_id: 0
+    })
+    
     const inputElement = useRef('');
+
+    //Using inputElement to check if it's the first render
+    //to prevent useEffect to run on initial render
+    useEffect(() => {
+        if(inputElement.current != '') {
+            patch(`/tasks/${detail.id}`)
+            inputElement.current.hide()
+        }
+    }, [data])
+
+
     useEffect(() => {
         const modalEl = document.getElementById('defaultModal');
         const options = {
             backdropClasses: 'bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40',
             closable: true,
         }
-        inputElement.current = new Modal(modalEl, options);
-        console.log(loaners);
+        inputElement.current = new Modal(modalEl, options)
     }, []);
 
 
+
     function handleClick(id) {
-        inputElement.current.show();
-        setDetail(...tasks.filter((task) => task.id == id));
+        inputElement.current.show()
+        setDetail(...tasks.filter((task) => task.id == id))
     }
 
     return (
@@ -33,21 +49,40 @@ export default function Dashboard({tasks, loaners}) {
         {/* > */}
         
             <Head title="Dashboard" />
-            <main className="dark:bg-gray-900 p-4 md:ml-64 h-screen pt-20">
-                <div className="grid grid-cols-12 divide-x-2 dark:divide-gray-800">
+            
+            <div className="grid grid-cols-12 divide-x-2 dark:divide-gray-800">
                     <div className="grid col-span-6 p-6 grid grid-rows-6">
-                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Repair Order</h1>
+                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Ready To Go</h1>
                         <div className="h-4 row-start-2 row-end-6 grid grid-cols-3">
-                            {tasks.map((task) =>
+                            {tasks.filter((task) => task.status_id == 5).map((task) =>
                                 <TaskCard key={task.id} task={task} handleClick={handleClick}/>
                             )}
                         </div>
                     </div>
 
                     <div className="grid col-span-6 p-6 grid grid-rows-6">
-                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Prepair Order</h1>
+                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Received</h1>
                         <div className="h-4 row-start-2 row-end-6 grid grid-cols-3">
-                            {tasks.map((task) =>
+                            {tasks.filter((task) => task.status_id == 1).map((task) =>
+                                <TaskCard key={task.id} task={task} handleClick={handleClick}/>
+                            )}
+                        </div>
+                    </div>
+                </div>
+                <div className="grid grid-cols-12 divide-x-2 dark:divide-gray-800">
+                    <div className="grid col-span-6 p-6 grid grid-rows-6">
+                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Pending Repair</h1>
+                        <div className="h-4 row-start-2 row-end-6 grid grid-cols-3">
+                            {tasks.filter((task) => task.status_id == 2).map((task) =>
+                                <TaskCard key={task.id} task={task} handleClick={handleClick}/>
+                            )}
+                        </div>
+                    </div>
+
+                    <div className="grid col-span-6 p-6 grid grid-rows-6">
+                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Pending Action</h1>
+                        <div className="h-4 row-start-2 row-end-6 grid grid-cols-3">
+                            {tasks.filter((task) => task.status_id == 4).map((task) =>
                                 <TaskCard key={task.id} task={task} handleClick={handleClick}/>
                             )}
                         </div>
@@ -76,10 +111,10 @@ export default function Dashboard({tasks, loaners}) {
                             <div className="flex items-start justify-between p-4 border-b rounded-t dark:border-gray-600">
                                 <div>
                                     <h3 className="text-2xl mb-3 font-bold text-gray-900 dark:text-white">
-                                        {detail.type}: {detail.title} - SO#{detail.service_order}
+                                        {detail.title} - SO#{detail.service_order}
                                     </h3>
                                     <h4 className="text-xl mb-3 text-gray-900 dark:text-white">
-                                        {('000' + detail.customer_id).slice(-4)} - {detail.customer}
+                                        {('000' + detail.customer_id).slice(-4)} - {detail.customer_name}
                                     </h4>
                                     <p className="text-base leading-relaxed text-gray-500 dark:text-gray-400 italic">Received on {detail.date}, picked up by {detail.user}</p>
                                 </div>
@@ -104,15 +139,13 @@ export default function Dashboard({tasks, loaners}) {
                                 className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                                     Modify
                                 </a>
-                                <button onClick={() => inputElement.current.hide()} type="button" className=" bg-white  focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm font-medium px-5 py-2.5  focus:z-10 dark:hover:text-white text-white bg-green-700 hover:bg-green-800 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Ready</button>
-                                <button onClick={() => inputElement.current.hide()} type="button" className="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Complete</button>
+                                <button onClick={() => setData('status_id', 5)} type="button" className=" bg-white  focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm font-medium px-5 py-2.5  focus:z-10 dark:hover:text-white text-white bg-green-700 hover:bg-green-800 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Ready</button>
+                                <button onClick={() => setData('status_id', 6)} type="button" className="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Complete</button>
                                 <button onClick={() => inputElement.current.hide()} type="button" className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Close</button>
-
                             </div>
                         </div>
                     </div>
                 </div>
-            </main>
         {/*</AuthenticatedLayout*>*/}
         </>
     );

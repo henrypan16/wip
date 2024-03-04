@@ -13,7 +13,7 @@ export default function Navbar({}) {
                   <span className="sr-only">Toggle sidebar</span>
               </button>
               <a href="/dashboard" className="flex items-center justify-between mr-4">
-                  <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">FT-WIP</span>
+                  <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Resource Department</span>
               </a>
               <form action="#" method="GET" className="hidden md:block md:pl-2">
                   <label htmlFor="topbar-search" className="sr-only">Search</label>

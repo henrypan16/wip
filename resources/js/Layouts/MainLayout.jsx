@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect} from 'react';
 import Navbar from './Navbar'
 import Sidebar from './Sidebar'
+import Content from './Content'
 
 export default function MainLayout({ children }) {
     const [darkMode, setDarkMode] = useState(localStorage.getItem('local') == 'true' ? true : false);
@@ -25,12 +26,12 @@ export default function MainLayout({ children }) {
 
 
   return (
-    <div className='antialiased bg-gray-50 dark:bg-gray-900'>
+    <div className='antialiased bg-gray-50 dark:bg-gray-900 h-screen w-screen'>
         <Navbar />
         <Sidebar handleChangeTheme={handleChangeTheme} darkMode={darkMode}/>
-        <div>
+        <Content>
             {children}
-        </div>
+        </Content>
     </div>
   )
 }

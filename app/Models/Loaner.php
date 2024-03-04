@@ -10,16 +10,13 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Loaner extends Model
 {
     use HasFactory;
-
+    protected $fillable = ['status'];
+    
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class);
     }
 
-    public function device(): BelongsTo
-    {
-        return $this->belongsTo(Device::class);
-    }
 
     public function tasks(): BelongsToMany
     {

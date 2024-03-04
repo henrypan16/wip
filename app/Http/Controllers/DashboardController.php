@@ -11,7 +11,6 @@ use App\Models\Status;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Task;
-use App\Models\Type;
 use App\Models\User;
 
 class DashboardController extends Controller
@@ -19,28 +18,46 @@ class DashboardController extends Controller
     //
     public function show()
     {
-        $tasks = Task::select('id', 'title', 'date', 'problem', 'service_order', 'note')
+        $tasks = Task::select('id', 'title', 'date', 'problem', 'service_order', 'note', 'customer_id', 'customer_name')
                     ->addSelect([
                         'user' => User::select('name')->whereColumn('user_id', 'users.id'),
-                        'customer_id' => Customer::select('id')->whereColumn('customer_id', 'customers.id'),
-                        'customer' => Customer::select('name')->whereColumn('customer_id', 'customers.id'),
-                        'status' => Status::select('name')->whereColumn('status_id', 'status.id'),
-                        'type' => Type::select('name')->whereColumn('type_id', 'types.id')
+                        'status_id' => Status::select('id')->whereColumn('status_id', 'status.id'),
+                        'status' => Status::select('name')->whereColumn('status_id', 'status.id')
                     ])
-                    ->where('status_id', 1)
+                    ->where('status_id', '!=', 6)
                     ->orderBy('created_at')
                     ->get();
         
         $loaners = Loaner::select('id', 'name', 'status')
                         ->addSelect([
-                            'category' => Category::select('name')->whereColumn('category_id', 'categories.id'),
-                            'device' => Device::select('name')->whereColumn('device_id', 'devices.id')])
-                        ->where('status', '!=', 'Available')
+                            'category' => Category::select('name')->whereColumn('category_id', 'categories.id')
+                            ])
+                        ->where('status', '>', 0)
                         ->get();
 
         return Inertia::render('Dashboard', [
             'tasks' => $tasks,
             'loaners' => $loaners
         ]);
-    } 
+    }
+
+    public function complete(string $task)
+    {
+        Task::where('id', $task)
+            ->update([
+                'status_id' => 6
+            ]);
+        
+        return to_route('dashboard');
+    }
+
+    public function ready(string $task)
+    {
+        Task::where('id', $task)
+            ->update([
+                'status_id' => 5
+            ]);
+        
+        return to_route('dashboard');
+    }
 }

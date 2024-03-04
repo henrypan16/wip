@@ -45,12 +45,9 @@ class HandleInertiaRequests extends Middleware
                     'location' => $request->url(),
                 ]);
             },
-            'customers' => fn() => Customer::all(),
             'categories' => fn() => Category::all(),
             'allLoaners' => fn() => Loaner::select('id','name','status')
             ->addSelect([
-                'device' => Device::select('name')
-                    ->whereColumn('device_id', 'devices.id'),
                 'category' => Category::select('name')
                     ->whereColumn('category_id', 'categories.id')
             ])->get(),

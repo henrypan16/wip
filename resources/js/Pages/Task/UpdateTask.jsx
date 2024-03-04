@@ -36,7 +36,7 @@ export default function UpdateTask({task, status}) {
     }
 
   return (
-    <main className={`dark:bg-gray-900 px-5 pb-80 sm:px-10 md:px-5 lg:pt-30 lg:px-32 xl:px-60 2xl:px-80 md:ml-64 h-auto pt-24`}>
+    <main className='dark:bg-gray-900 px-5 sm:px-10 md:px-5 lg:pt-30 lg:px-32 2xl:px-80 pt-12'>
         <Head title="Update Task"></Head>
         
         <form onSubmit={submit}>
@@ -55,7 +55,7 @@ export default function UpdateTask({task, status}) {
                 </div>
                 <div className="sm:col-span-6">
                     <label htmlFor="service_order" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Service Order</label>
-                    <input readOnly value={task.service_order} type="number" name="service_order" id="service_order"
+                    <input value={task.service_order} type="number" name="service_order" id="service_order"
                     className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Service Order" required/>
                 </div>
                 <div className="sm:col-span-8">
@@ -72,7 +72,7 @@ export default function UpdateTask({task, status}) {
                 </div>
                 <div className="sm:col-span-full">
                     <label htmlFor="name" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Pharmacy's Name</label>
-                    <input value={task.customer} readOnly type="text" name="name" id="name"
+                    <input value={task.customer_name} readOnly type="text" name="name" id="name"
                     className="bg-white border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500" placeholder="Pharmacy's name"equired=""/>
                 </div>
 
@@ -104,8 +104,11 @@ export default function UpdateTask({task, status}) {
             </div>
             <button type="submit" disabled={processing}
             className="inline-flex focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">
-                <svg className="mr-1 -ml-1 w-6 h-6" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd"></path></svg>
                 Update
+            </button>
+            <button onClick={() => window.open('/','_self')} disabled={processing}
+            className="inline-flex focus:outline-none text-gray-900 bg-white border border-gray-300 focus:outline-none hover:bg-gray-100 focus:ring-4 focus:ring-gray-100 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:text-white dark:border-gray-600 dark:hover:bg-gray-700 dark:hover:border-gray-600 dark:focus:ring-gray-700">
+                Return
             </button>
         </form>
     </main>

@@ -1,19 +1,10 @@
 import React from 'react'
 import { useState, useEffect } from 'react'
 
-export default function LoanerTable({loaners}) {
+export default function KeysTable({loaners}) {
     const [allLoaners, setAllLoaners] = useState([]);
-    const [currentPage, setCurrentPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1);
     const page = Array.from(Array(Math.ceil(loaners.length/10)).keys());
-    let statusDict = new Map([
-        ['0', 'Available'],
-        ['-1', 'Discontinued']
-    ])
-
-    useEffect(() => {
-        console.log(loaners)
-    }, [])
-    
 
     return (
         <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5">
@@ -104,19 +95,19 @@ export default function LoanerTable({loaners}) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {[...Array(10)].map((e,i) => {if((currentPage * 10 + i) < loaners.length)
+                                {loaners.map((loaner) =>
                                     // For 10 rows per page, if row does not belong to the page, it will be hidden
-                                    return <tr key={i} className={"border-b dark:border-gray-700"}>
-                                        <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{loaners[i + currentPage * 10 ].name}</th>
-                                        <td className="px-4 py-3">{loaners[i + currentPage * 10 ].category}</td>
-                                        <td className="px-4 py-3">{loaners[i + currentPage * 10 ].status <= 0 ? statusDict.get(loaners[i + currentPage * 10 ].status):  loaners[i + currentPage * 10 ].status}</td>
+                                    <tr key={loaner.id} className={"border-b dark:border-gray-700 " + ((loaner.id>(currentPage-1)*10) && (loaner.id<=((currentPage-1)*10+10))? '' : 'hidden')}>
+                                        <th scope="row" className="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{loaner.device} #{loaner.name}</th>
+                                        <td className="px-4 py-3">{loaner.category}</td>
+                                        <td className="px-4 py-3">{loaner.status}</td>
                                         <td className="px-4 py-3 flex items-center justify-end">
-                                            <button data-dropdown-toggle={loaners[i + currentPage * 10 ].id} className="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100" type="button">
+                                            <button data-dropdown-toggle={loaner.id} className="inline-flex items-center p-0.5 text-sm font-medium text-center text-gray-500 hover:text-gray-800 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100" type="button">
                                                 <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
                                                 </svg>
                                             </button>
-                                            <div id={loaners[i + currentPage * 10 ].id} className="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
+                                            <div id={loaner.id} className="hidden z-10 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
                                                 <ul className="py-1 text-sm text-gray-700 dark:text-gray-200" >
                                                     <li>
                                                         <a href="#" className="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Show</a>
@@ -131,20 +122,20 @@ export default function LoanerTable({loaners}) {
                                             </div>
                                         </td>
                                     </tr>
-                                    })}
+                                    )}
                             </tbody>
                         </table>
                     </div>
                     <nav className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4" aria-label="Table navigation">
                         <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                             Showing
-                            <span className="font-semibold text-gray-900 dark:text-white"> {currentPage * 10 + 1} - {(currentPage + 1) * 10 < loaners.length ? (currentPage + 1)* 10 : loaners.length} </span>
+                            <span className="font-semibold text-gray-900 dark:text-white"> {(currentPage - 1) * 10 + 1} - {currentPage * 10 < loaners.length ? currentPage * 10 : loaners.length} </span>
                             of
                             <span className="font-semibold text-gray-900 dark:text-white"> {loaners.length}</span>
                         </span>
                         <ul className="inline-flex items-stretch -space-x-px">
                             <li>
-                                <a href="#" onClick={() => {if(currentPage != 0) setCurrentPage(currentPage - 1)}} className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                                <a href="#" onClick={() => {if(currentPage != 1) setCurrentPage(currentPage - 1)}} className="flex items-center justify-center h-full py-1.5 px-3 ml-0 text-gray-500 bg-white rounded-l-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                                     <span className="sr-only">Previous</span>
                                     <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                         <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
@@ -154,12 +145,12 @@ export default function LoanerTable({loaners}) {
                                 {
                                 page.map((x) => 
                                     <li key={x}>
-                                        <a key={x} href="#" onClick={() => setCurrentPage(x)} className={"flex items-center justify-center text-sm py-2 px-3 leading-tight border border-gray-300 hover:bg-gray-100 hover:text-gray-700  dark:hover:bg-gray-700 dark:hover:text-white" + (x == currentPage ? "text-primary-600 bg-primary-50 border-gray-700 dark:bg-gray-700 dark:text-white" : "text-gray-500 bg-white dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800")}>{x+1}</a>
+                                        <a key={x} href="#" onClick={() => setCurrentPage(x+1)} className={"flex items-center justify-center text-sm py-2 px-3 leading-tight border border-gray-300 hover:bg-gray-100 hover:text-gray-700  dark:hover:bg-gray-700 dark:hover:text-white" + (x+1 == currentPage ? "text-primary-600 bg-primary-50 border-gray-700 dark:bg-gray-700 dark:text-white" : "text-gray-500 bg-white dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800")}>{x+1}</a>
                                     </li>
                                 )}
 
                             <li>
-                                <a href="#" onClick={() => {if(currentPage != page.length - 1) setCurrentPage(currentPage + 1)}} className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
+                                <a href="#" onClick={() => {if(currentPage != page.length) setCurrentPage(currentPage + 1)}} className="flex items-center justify-center h-full py-1.5 px-3 leading-tight text-gray-500 bg-white rounded-r-lg border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white">
                                     <span className="sr-only">Next</span>
                                     <svg className="w-5 h-5" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                         <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />

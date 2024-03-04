@@ -9,7 +9,6 @@ use Inertia\Inertia;
 use App\Models\Task;
 use App\Models\Customer;
 use App\Models\Loaner;
-use App\Models\Device;
 use App\Models\Category;
 use App\Models\Status;
 use App\Models\User;
@@ -30,17 +29,14 @@ class TaskController extends Controller
      */
     public function create()
     {
-        $customers = Customer::all();
         $loaners = Loaner::select('id','name','status')
             ->addSelect([
-                'device' => Device::select('name')->whereColumn('device_id', 'devices.id'),
                 'category' => Category::select('name')->whereColumn('category_id', 'categories.id')])
-            ->where('status', 'Available')
+            ->where('status', '0')
             ->get();
         $users = User::all();
                 
         return Inertia::render('Task/CreateTask', [
-            'customers' => $customers,
             'allLoaners' => $loaners,
             'users' => $users
         ]);
@@ -51,6 +47,7 @@ class TaskController extends Controller
      */
     public function store(Request $request)
     {
+        
         $request->validate([
             'customer_id' => 'required',
             'user_id' => 'required',
@@ -63,6 +60,7 @@ class TaskController extends Controller
         $task = Task::create([
             'user_id' => $request->user_id,
             'customer_id' => $request->customer_id,
+            'customer_name' => $request->customer_name,
             'date' => $request->date,
             'title' => $request->title,
             'service_order' => $request->service_order,
@@ -98,11 +96,9 @@ class TaskController extends Controller
     public function edit(string $id)
     {   
         $status = Status::all();
-        $task = Task::select('id', 'title', 'date', 'problem', 'service_order', 'note', 'equipment')
+        $task = Task::select('id', 'title', 'date', 'problem', 'service_order', 'note', 'equipment', 'customer_id', 'customer_name')
                     ->addSelect([
                         'user' => User::select('name')->whereColumn('user_id', 'users.id'),
-                        'customer_id' => Customer::select('id')->whereColumn('customer_id', 'customers.id'),
-                        'customer' => Customer::select('name')->whereColumn('customer_id', 'customers.id'),
                         'status_id' => Status::select('id')->whereColumn('status_id', 'status.id')
                     ])
                     ->where('id', $id)
@@ -120,21 +116,30 @@ class TaskController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
-            'title' => 'required',
-            'equipment' => 'required',
-            'problem' => 'required']);
+        // $request->validate([
+        //     'title' => 'required',
+        //     'equipment' => 'required',
+        //     'problem' => 'required']);
+        $task = Task::where('id', $id)->first();
+        $loaners = Loaner::where('status', $task->customer_id)->get();
 
-        $task = Task::where('id', $id)
-            ->update([
-                'title' => $request->title,
-                'equipment' => $request->equipment,
-                'problem' => $request->problem,
-                'note' => $request->note,
-                'status_id' => $request->status_id
+        $task->update([
+                'title' => $request->title == null ? $task->title : $request->title,
+                'equipment' => $request->equipment == null ? $task->equipment : $request->equipment,
+                'problem' => $request->problem == null ? $task->problem : $request->problem,
+                'note' => $request->note == null ? $task->note : $request->note,
+                'status_id' => $request->status_id == null ? $task->status_id : $request->status_id,
             ]);
 
-        return to_route('dashboard');   
+        if($task->status_id == 6)
+        {
+            foreach($loaners as $loaner) {
+                $loaner->update([
+                    'status' => 0
+                ]);
+            }
+        }
+        return to_route('dashboard');
         //
     }
 

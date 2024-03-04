@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TaskController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\LoanerController;
+use App\Http\Controllers\KeysController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -33,10 +34,15 @@ Route::resource('/tasks', TaskController::class);
 
 Route::get('/', [DashboardController::class, 'show'])->name('dashboard');
 Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
+Route::patch('/dashboard/complete/{task}', [DashboardController::class, 'complete'])->name('complete');
+Route::patch('/dashboard/ready', [DashboardController::class, 'ready'])->name('ready');
+
 Route::get('/receive', function() {
     return Inertia::render('Task/ReceiveForm');});
 // ->middleware(['auth', 'verified'])->name('dashboard');
 Route::get('/loaner', [LoanerController::class, 'show'])->name('loaner');
+Route::get('/keys',[KeysController::class, 'show'])->name('keys');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
