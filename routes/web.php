@@ -30,7 +30,8 @@ use Inertia\Inertia;
 //     ]);
 // });
 
-Route::resource('/tasks', TaskController::class);
+Route::resource('/task', TaskController::class);
+Route::resource('/loaner', LoanerController::class);
 
 Route::get('/', [DashboardController::class, 'show'])->name('dashboard');
 Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
@@ -40,7 +41,6 @@ Route::patch('/dashboard/ready', [DashboardController::class, 'ready'])->name('r
 Route::get('/receive', function() {
     return Inertia::render('Task/ReceiveForm');});
 // ->middleware(['auth', 'verified'])->name('dashboard');
-Route::get('/loaner', [LoanerController::class, 'show'])->name('loaner');
 Route::get('/keys',[KeysController::class, 'show'])->name('keys');
 
 

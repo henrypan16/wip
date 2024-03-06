@@ -6,7 +6,6 @@ import TaskCard from './Task/TaskCard'
 import LoanerCard from './LoanerCard'
 
 export default function Dashboard({tasks, loaners}) {
-    const mainCategory = ['Tower PC', 'Backpack PC', 'Laser Printer', 'Thermal Printer', 'Scanner'];
     const [selectedTask, setSelectedTask] = useState(0);
     const [detail, setDetail] = useState({});
     const { data, setData, patch } = useForm({
@@ -19,7 +18,7 @@ export default function Dashboard({tasks, loaners}) {
     //to prevent useEffect to run on initial render
     useEffect(() => {
         if(inputElement.current != '') {
-            patch(`/tasks/${detail.id}`)
+            patch(`/task/${detail.id}`)
             inputElement.current.hide()
         }
     }, [data])
@@ -32,9 +31,8 @@ export default function Dashboard({tasks, loaners}) {
             closable: true,
         }
         inputElement.current = new Modal(modalEl, options)
+        console.log(loaners)
     }, []);
-
-
 
     function handleClick(id) {
         inputElement.current.show()
@@ -61,38 +59,19 @@ export default function Dashboard({tasks, loaners}) {
                     </div>
 
                     <div className="grid col-span-6 p-6 grid grid-rows-6">
-                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Received</h1>
+                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Not Ready</h1>
                         <div className="h-4 row-start-2 row-end-6 grid grid-cols-3">
-                            {tasks.filter((task) => task.status_id == 1).map((task) =>
+                            {tasks.filter((task) => task.status_id < 5).map((task) =>
                                 <TaskCard key={task.id} task={task} handleClick={handleClick}/>
                             )}
                         </div>
                     </div>
-                </div>
-                <div className="grid grid-cols-12 divide-x-2 dark:divide-gray-800">
-                    <div className="grid col-span-6 p-6 grid grid-rows-6">
-                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Pending Repair</h1>
-                        <div className="h-4 row-start-2 row-end-6 grid grid-cols-3">
-                            {tasks.filter((task) => task.status_id == 2).map((task) =>
-                                <TaskCard key={task.id} task={task} handleClick={handleClick}/>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="grid col-span-6 p-6 grid grid-rows-6">
-                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Pending Action</h1>
-                        <div className="h-4 row-start-2 row-end-6 grid grid-cols-3">
-                            {tasks.filter((task) => task.status_id == 4).map((task) =>
-                                <TaskCard key={task.id} task={task} handleClick={handleClick}/>
-                            )}
-                        </div>
-                    </div>
-                </div>
+            </div>
 
                 {/* Loop through mainCategory array, in each category: loop through the number of loaner */}
                 {/* loaners.reduce is used to find the number of loaners in each category, then only render category with positive number */}
-                <div className="grid col-span-full m-6">
-                        <h1 className="text-lg text-gray-900 dark:text-white mb-4">Missing Loaners: </h1>
+                {/* <div className="grid col-span-full m-6">
+                        <h1 className="text-lg text-gray-900 dark:text-white mb-4">Loaner Status:</h1>
                         {mainCategory.map((category) => loaners.reduce((acc, cur) => cur.category === category ? ++acc : acc, 0) != 0 &&
                             <div key={category} className="grid grid-cols-6">
                                 <h1 className="text-lg text-gray-900 dark:text-white mb-4 col-span-full ">{category}</h1>
@@ -100,8 +79,35 @@ export default function Dashboard({tasks, loaners}) {
                                     <LoanerCard key={loaner.id} loaner={loaner}/>)}
                             </div>)}
                         
-                </div>
+                </div> */}
 
+                <div className="mt-20 flex col-span-full flex-col">
+                    <h1 className="text-lg text-gray-900 dark:text-white mb-4">Loaner Status:</h1>
+                    <h3 className="text-sm text-gray-900 dark:text-white my-4 row-span-1 col-span-full">COMPUTERS</h3>
+                    <div className="grid grid-cols-8">
+                        <div className="flex col-span-3">
+                        {loaners.map((loaner) => loaner.category_id == 9 &&
+                            <LoanerCard key={loaner.id} loaner={loaner}/>)}
+                        </div >
+                        <div className="flex col-start-5 col-span-5">
+                            {loaners.map((loaner) => loaner.category_id == 1 &&
+                                <LoanerCard key={loaner.id} loaner={loaner}/>)}
+                        </div>
+                    </div>
+                    <h3 className="text-sm text-gray-900 dark:text-white my-4 row-span-1 col-span-full">PRINTERS</h3>
+                    <div className="grid grid-cols-8">
+                        <div className="flex flex-wrap col-span-4">
+                            {loaners.map((loaner) => (loaner.category_id == 3) &&
+                                    <LoanerCard key={loaner.id} loaner={loaner}/>)}        
+                        </div>
+
+                        <div className="flex flex-wrap col-start-6 col-span-4">
+                            {loaners.map((loaner) => (loaner.category_id == 5) &&
+                                    <LoanerCard key={loaner.id} loaner={loaner}/>)}        
+                        </div>
+                    </div>   
+
+                </div>
 
                 <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
                     <div className="relative w-full max-w-2xl max-h-full">
@@ -135,7 +141,7 @@ export default function Dashboard({tasks, loaners}) {
                             </div>
                             {/* <!-- Modal footer --> */}
                             <div className="flex items-center p-6 space-x-2 border-t border-gray-200 rounded-b dark:border-gray-600">
-                                <a href={`/tasks/${detail.id}/edit`} type="button"
+                                <a href={`/task/${detail.id}/edit`} type="button"
                                 className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                                     Modify
                                 </a>

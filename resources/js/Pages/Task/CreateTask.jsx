@@ -62,7 +62,7 @@ export default function CreateTask({allLoaners, customers, users}) {
 
     function submit(e) {
         e.preventDefault();
-        post('/tasks');
+        post('/task');
     }
 
   return (

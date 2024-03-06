@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Loaner extends Model
 {
     use HasFactory;
-    protected $fillable = ['status'];
+    protected $fillable = ['status', 'note'];
     
     public function category(): BelongsTo
     {

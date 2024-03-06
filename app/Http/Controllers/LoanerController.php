@@ -10,7 +10,7 @@ use App\Models\Category;
 
 class LoanerController extends Controller
 {
-    public function show()
+    public function index()
     {
         $loaners = Loaner::select()
                     ->addSelect([
@@ -24,7 +24,11 @@ class LoanerController extends Controller
     }
 
     public function update(Request $request, string $id)
-    {
-        return to_route('loaner');
+    {  
+        Loaner::where('id', $id)->update(
+            ['note' => $request->note]
+        );
+
+        echo('Loaner' . $id . 'updated');
     }
 }

@@ -3,12 +3,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Category;
-use App\Models\Customer;
-use App\Models\Device;
 use App\Models\Loaner;
 use App\Models\Status;
-use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Models\Task;
 use App\Models\User;
@@ -28,11 +24,7 @@ class DashboardController extends Controller
                     ->orderBy('created_at')
                     ->get();
         
-        $loaners = Loaner::select('id', 'name', 'status')
-                        ->addSelect([
-                            'category' => Category::select('name')->whereColumn('category_id', 'categories.id')
-                            ])
-                        ->where('status', '>', 0)
+        $loaners = Loaner::where('status', '>=', 0)
                         ->get();
 
         return Inertia::render('Dashboard', [
