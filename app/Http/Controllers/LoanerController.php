@@ -18,7 +18,7 @@ class LoanerController extends Controller
                     ])
                     ->get();
 
-        return Inertia::render('Loaner/LoanerTable', [
+        return Inertia::render('Loaners', [
             'loaners' => $loaners
         ]);
     }

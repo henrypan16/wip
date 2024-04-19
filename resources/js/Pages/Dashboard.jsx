@@ -1,28 +1,61 @@
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { useForm } from '@inertiajs/react'
-import { useContext, useState, useEffect, useRef } from 'react';
-import TaskCard from './Task/TaskCard'
-import LoanerCard from './LoanerCard'
+import { useContext, useState, useEffect, useRef, useLayoutEffect } from 'react';
+import TaskCard from '../Components/Dashboard/TaskCard'
+import TaskSection from '../Components/Dashboard/TaskSection'
+import LoanerCard from '../Components/Dashboard/LoanerCard'
+import LoanerSection from '../Components/Dashboard/LoanerSection'
+
+function useWindowSize() {
+    const [size, setSize] = useState([0, 0]);
+    useLayoutEffect(() => {
+      function updateSize() {
+        setSize([window.innerWidth, window.innerHeight]);
+      }
+      window.addEventListener('resize', updateSize);
+      updateSize();
+      return () => window.removeEventListener('resize', updateSize);
+    }, []);
+    return size;
+}
 
 export default function Dashboard({tasks, loaners}) {
     const [selectedTask, setSelectedTask] = useState(0);
+    const [maxTask, setMaxTask] = useState(8);
     const [detail, setDetail] = useState({});
     const { data, setData, patch } = useForm({
         status_id: 0
     })
+    const [width, height] = useWindowSize();
     
     const inputElement = useRef('');
 
+    
     //Using inputElement to check if it's the first render
     //to prevent useEffect to run on initial render
     useEffect(() => {
-        if(inputElement.current != '') {
+        if(inputElement.current != '' && detail.id > 0 ) {
             patch(`/task/${detail.id}`)
             inputElement.current.hide()
         }
     }, [data])
 
+    useEffect(() => {
+        if(width < 900)
+        {
+            setMaxTask(3)
+        }
+        else if(width < 1450)
+        {
+            setMaxTask(5)
+        }
+        else
+        {
+            setMaxTask(8)
+        }
+    }, [width])
+    
 
     useEffect(() => {
         const modalEl = document.getElementById('defaultModal');
@@ -37,6 +70,7 @@ export default function Dashboard({tasks, loaners}) {
     function handleClick(id) {
         inputElement.current.show()
         setDetail(...tasks.filter((task) => task.id == id))
+        console.log(window.innerWidth)
     }
 
     return (
@@ -47,67 +81,19 @@ export default function Dashboard({tasks, loaners}) {
         {/* > */}
         
             <Head title="Dashboard" />
-            
-            <div className="grid grid-cols-12 divide-x-2 dark:divide-gray-800">
-                    <div className="grid col-span-6 p-6 grid grid-rows-6">
-                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Ready To Go</h1>
-                        <div className="h-4 row-start-2 row-end-6 grid grid-cols-3">
-                            {tasks.filter((task) => task.status_id == 5).map((task) =>
-                                <TaskCard key={task.id} task={task} handleClick={handleClick}/>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="grid col-span-6 p-6 grid grid-rows-6">
-                        <h1 className="h-4 text-lg text-gray-900 dark:text-white mb-4 col-span-full row-start-1 row-end-1">Not Ready</h1>
-                        <div className="h-4 row-start-2 row-end-6 grid grid-cols-3">
-                            {tasks.filter((task) => task.status_id < 5).map((task) =>
-                                <TaskCard key={task.id} task={task} handleClick={handleClick}/>
-                            )}
-                        </div>
-                    </div>
+            <div className="flex divide-x-2 dark:divide-gray-800 mb-24">
+                <TaskSection tasks={tasks.filter((task) => task.status_id == 5).slice(0,maxTask)} click={handleClick} title="Ready To Go"/>
+                <TaskSection tasks={tasks.filter((task) => task.status_id < 5).slice(0,maxTask)} click={handleClick} title="Not Ready"/>
             </div>
-
-                {/* Loop through mainCategory array, in each category: loop through the number of loaner */}
-                {/* loaners.reduce is used to find the number of loaners in each category, then only render category with positive number */}
-                {/* <div className="grid col-span-full m-6">
-                        <h1 className="text-lg text-gray-900 dark:text-white mb-4">Loaner Status:</h1>
-                        {mainCategory.map((category) => loaners.reduce((acc, cur) => cur.category === category ? ++acc : acc, 0) != 0 &&
-                            <div key={category} className="grid grid-cols-6">
-                                <h1 className="text-lg text-gray-900 dark:text-white mb-4 col-span-full ">{category}</h1>
-                                {loaners.map((loaner) => loaner.category == category &&
-                                    <LoanerCard key={loaner.id} loaner={loaner}/>)}
-                            </div>)}
-                        
-                </div> */}
-
-                <div className="mt-20 flex col-span-full flex-col">
-                    <h1 className="text-lg text-gray-900 dark:text-white mb-4">Loaner Status:</h1>
-                    <h3 className="text-sm text-gray-900 dark:text-white my-4 row-span-1 col-span-full">COMPUTERS</h3>
-                    <div className="grid grid-cols-8">
-                        <div className="flex col-span-3">
-                        {loaners.map((loaner) => loaner.category_id == 9 &&
-                            <LoanerCard key={loaner.id} loaner={loaner}/>)}
-                        </div >
-                        <div className="flex col-start-5 col-span-5">
-                            {loaners.map((loaner) => loaner.category_id == 1 &&
-                                <LoanerCard key={loaner.id} loaner={loaner}/>)}
-                        </div>
-                    </div>
-                    <h3 className="text-sm text-gray-900 dark:text-white my-4 row-span-1 col-span-full">PRINTERS</h3>
-                    <div className="grid grid-cols-8">
-                        <div className="flex flex-wrap col-span-4">
-                            {loaners.map((loaner) => (loaner.category_id == 3) &&
-                                    <LoanerCard key={loaner.id} loaner={loaner}/>)}        
-                        </div>
-
-                        <div className="flex flex-wrap col-start-6 col-span-4">
-                            {loaners.map((loaner) => (loaner.category_id == 5) &&
-                                    <LoanerCard key={loaner.id} loaner={loaner}/>)}        
-                        </div>
-                    </div>   
-
+            <div className="hidden md:block">
+                <h1 className="text-lg text-gray-900 dark:text-white mb-2">Loaner Status:</h1>
+                <div className="flex">
+                    <LoanerSection loaners={loaners.filter((loaner) => loaner.category_id == 9)} title="Backpack Computers"/>
+                    <LoanerSection loaners={loaners.filter((loaner) => loaner.category_id == 1)} title="Tower Computers"/>
+                    <LoanerSection loaners={loaners.filter((loaner) => loaner.category_id == 3)} title="Laser Printers"/>
+                    <LoanerSection loaners={loaners.filter((loaner) => loaner.category_id == 5)} title="Thermal Printers"/>
                 </div>
+            </div>
 
                 <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
                     <div className="relative w-full max-w-2xl max-h-full">

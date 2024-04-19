@@ -32,7 +32,7 @@ export default function UpdateTask({task, status}) {
 
     function submit(e) {
         e.preventDefault();
-        patch(`/tasks/${task.id}`);
+        patch(`/task/${task.id}`);
     }
 
   return (

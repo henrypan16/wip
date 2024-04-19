@@ -66,7 +66,7 @@ export default function CreateTask({allLoaners, customers, users}) {
     }
 
   return (
-    <div className="dark:bg-gray-900 px-5 sm:px-10 md:px-5 lg:pt-30 lg:px-32 2xl:px-80 pt-12">
+    <div className="dark:bg-gray-900 px-5 sm:px-10 md:px-0 lg:px-18 2xl:px-60 pt-12">
         <Head title="New Task"></Head>
         
         <form onSubmit={submit}>
@@ -75,13 +75,13 @@ export default function CreateTask({allLoaners, customers, users}) {
                     <span className="text-3xl text-bold dark:text-white">Create New Task</span>
                 </div>
                 <FormFieldTitle onChange={e => setData('title', e.target.value)} placeholder="Title" value={data.title}/>
-                <FormField onChange={e => setData('customer_id', ('000' + e.target.value).slice(-4))} id="customer_id" colspan="sm:col-span-4" type="number" placeholder="Customer ID" required={true} value={data.customer_id}/>
-                <FormField onChange={e => setData('service_order', ('00000' + e.target.value).slice(-6))} id="service_order" colspan="sm:col-span-6" type="number" placeholder="Service Order" required={true} value={data.service_order}/>
+                <FormField onChange={e => setData('customer_id', ('000' + e.target.value).slice(-4))} formfields={{id:"customer_id", colspan:"sm:col-span-4", type:"number", placeholder:"Customer ID", required:true, value:data.customer_id}}/>
+                <FormField onChange={e => setData('service_order', ('00000' + e.target.value).slice(-6))} formfields={{id:"service_order", colspan:"sm:col-span-6", type:"number", placeholder:"Service Order", required:true, value:data.service_order}}/>
                 <FormFieldDate value={date} id="date" colspan="sm:col-span-4" onChange={e => setDate(e.target.value)} placeholder="Receive Date"/>
                 <FormFieldOption id="user" colspan="sm:col-span-4" value={data.user_id} onChange={e => setData('user_id', e.target.value)} placeholder="Technician" users={users} required={true}/>
-                <FormField onChange={e => setData('customer_name', e.target.value)} id="name" colspan="sm:col-span-full" type="text" placeholder="Pharmacy's Name" required={true} value={data.customer_name}/>
-                <FormField onChange={e => setData('equipment', e.target.value)} id="equipment" colspan="sm:col-span-full" type="text" placeholder="Equipment" required={true} value={data.equipment}/>
-                <FormField onChange={e => setData('problem', e.target.value)} id="problem" colspan="sm:col-span-full" type="text" placeholder="Problem" required={true} value={data.problem}/>
+                <FormField onChange={e => setData('customer_name', e.target.value)} formfields={{id:"Pharmacy's Name", colspan:"sm:col-span-full", type:"number", placeholder:"Customer's Name", required:true, value:data.customer_name}}/>
+                <FormField onChange={e => setData('equipment', e.target.value)} formfields={{id:"service_order", colspan:"sm:col-span-full", type:"number", placeholder:"Equipment", required:true, value:data.equipment}}/>
+                <FormField onChange={e => setData('problem', e.target.value)} formfields={{id:"service_order", colspan:"sm:col-span-full", type:"number", placeholder:"Problem", required:true, value:data.problem}}/>
                 <FormFieldTextarea onChange={e => setData('note', e.target.value)} id="note" colspan="sm:col-span-full" type="textarea" placeholder="Note" required={true} value={data.note} row={3}/>                
                 <LoanerSelection addLoaner={addLoaner} allLoaners={all}/>
                 

@@ -20,7 +20,15 @@ class TaskController extends Controller
      */
     public function index()
     {
-        return Inertia::render('TestPage');
+        $tasks = Task::select('id', 'customer_id as Customer ID', 'customer_name as Pharmacy', 'service_order as SO#', 'problem as Problem', 'note as Note')
+            ->addSelect([
+                'Loaner' => Loaner::select('name')->whereColumn('id', 'tasks.id')
+            ])
+            ->get();
+
+        return Inertia::render('Tasks', [
+            'tasks' => $tasks
+]);
         //
     }
 
