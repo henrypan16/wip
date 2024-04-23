@@ -34,7 +34,7 @@ Route::resource('/task', TaskController::class);
 Route::resource('/loaner', LoanerController::class);
 
 Route::get('/', [DashboardController::class, 'show']);
-Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'show'])->name('dashboard')->middleware('auth');
 Route::patch('/dashboard/complete/{task}', [DashboardController::class, 'complete'])->name('complete');
 Route::patch('/dashboard/ready', [DashboardController::class, 'ready'])->name('ready');
 

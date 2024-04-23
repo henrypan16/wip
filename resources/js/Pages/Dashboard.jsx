@@ -75,11 +75,7 @@ export default function Dashboard({tasks, loaners}) {
 
     return (
         <>
-        {/* <AuthenticatedLayout */}
-            {/* user={auth.user} */}
-            {/* header={<h2 className="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">Dashboard</h2>} */}
-        {/* > */}
-        
+      
             <Head title="Dashboard" />
             <div className="flex divide-x-2 dark:divide-gray-800 mb-24">
                 <TaskSection tasks={tasks.filter((task) => task.status_id == 5).slice(0,maxTask)} click={handleClick} title="Ready To Go"/>
@@ -131,7 +127,7 @@ export default function Dashboard({tasks, loaners}) {
                                 className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-blue-600 dark:hover:bg-blue-700 focus:outline-none dark:focus:ring-blue-800">
                                     Modify
                                 </a>
-                                <button onClick={() => setData('status_id', 5)} type="button" className=" bg-white  focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm font-medium px-5 py-2.5  focus:z-10 dark:hover:text-white text-white bg-green-700 hover:bg-green-800 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Ready</button>
+                                <button onClick={() => setData('status_id', 5)} type="button" className="focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg text-sm font-medium px-5 py-2.5  focus:z-10 dark:hover:text-white text-white bg-green-700 hover:bg-green-800 focus:ring-green-300 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Ready</button>
                                 <button onClick={() => setData('status_id', 6)} type="button" className="focus:outline-none text-white bg-purple-700 hover:bg-purple-800 focus:ring-4 focus:ring-purple-300 font-medium rounded-lg text-sm px-5 py-2.5 dark:bg-purple-600 dark:hover:bg-purple-700 dark:focus:ring-purple-900">Complete</button>
                                 <button onClick={() => inputElement.current.hide()} type="button" className="text-gray-500 bg-white hover:bg-gray-100 focus:ring-4 focus:outline-none focus:ring-blue-300 rounded-lg border border-gray-200 text-sm font-medium px-5 py-2.5 hover:text-gray-900 focus:z-10 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-500 dark:hover:text-white dark:hover:bg-gray-600 dark:focus:ring-gray-600">Close</button>
                             </div>

@@ -16,10 +16,7 @@ export default function Table({data, config}) {
     return (
         <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg overflow-hidden">
             <TableToolbar config={config}/>
-            <TableData data={currentData}/>
+            <TableData data={currentData} width={config.width}/>
             <TableNavigation max={data.length} page={page} currentPage={currentPage} setCurrentPage={setCurrentPage}/>
-            <button onClick={() => console.log(currentData)}>
-                TEST
-            </button>
         </div>)
 }

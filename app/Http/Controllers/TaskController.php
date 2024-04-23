@@ -20,9 +20,9 @@ class TaskController extends Controller
      */
     public function index()
     {
-        $tasks = Task::select('id', 'customer_id as Customer ID', 'customer_name as Pharmacy', 'service_order as SO#', 'problem as Problem', 'note as Note')
+        $tasks = Task::select('id', 'customer_id', 'customer_name', 'service_order', 'problem', 'note')
             ->addSelect([
-                'Loaner' => Loaner::select('name')->whereColumn('id', 'tasks.id')
+                'loaner' => Loaner::select('name')->whereColumn('id', 'tasks.id')
             ])
             ->get();
 

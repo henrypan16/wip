@@ -8,6 +8,7 @@ use App\Models\Status;
 use Inertia\Inertia;
 use App\Models\Task;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
@@ -23,7 +24,7 @@ class DashboardController extends Controller
                     ->where('status_id', '!=', 6)
                     ->orderBy('created_at')
                     ->get();
-        
+
         $loaners = Loaner::where('status', '>=', 0)
                         ->get();
 
