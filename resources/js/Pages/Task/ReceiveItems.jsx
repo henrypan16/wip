@@ -1,5 +1,5 @@
 import React from 'react'
-import { FormFieldNoLabel } from '../FormComponents'
+import { FormFieldNoLabel } from '@/Components/Form'
 import { useState, useEffect } from 'react'
 
 export default function ReceiveItems({pcList, addPc, removePc}) {

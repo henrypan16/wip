@@ -7,7 +7,7 @@ import LoanerSelection from './LoanerSelection'
 import { initFlowbite } from 'flowbite'
 import Datepicker from 'flowbite-datepicker/Datepicker';
 import { format } from 'date-fns'
-import { FormField, FormFieldDate, FormFieldTextarea, FormFieldTitle } from '../FormComponents'
+import { FormField, FormFieldDate, FormFieldTextarea, FormFieldTitle } from '@/Components/Form'
 import ReceiveItems from './ReceiveItems'
 
 export default function CreateInstallation({allLoaners, customers}) {

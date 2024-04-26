@@ -1,4 +1,4 @@
-import { FormFieldDate, FormFieldTextarea, FormFieldTitle, FormFieldOption } from '../FormComponents'
+import { FormFieldDate, FormFieldTextarea, FormFieldTitle, FormFieldOption } from './index'
 
 export default function FormField({onChange, formfields}) {
 

@@ -1,4 +1,4 @@
-import { SidebarSearch, SidebarMenu, SidebarDarkModeButton } from './SidebarComponent'
+import { SidebarSearch, SidebarMenu, SidebarDarkModeButton } from '@/Components/Navigation/Sidebar'
 
 export default function Sidebar({handleChangeTheme, darkMode}) {
     return (

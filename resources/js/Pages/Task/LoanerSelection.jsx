@@ -1,6 +1,6 @@
 import { InputGroup, Col, Row, Form, Button } from 'react-bootstrap';
 import { useState } from 'react'
-import { FormFieldNoLabel } from '../FormComponents'
+import { FormFieldNoLabel } from '@/Components/Form'
 
 
 export default function LoanerSelection({addLoaner, allLoaners}) {

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useForm } from '@inertiajs/react'
 import LoanerSelection from './LoanerSelection'
 import { format } from 'date-fns'
-import { FormField, FormFieldDate, FormFieldTextarea, FormFieldTitle, FormFieldOption } from '../FormComponents'
+import { FormField, FormFieldDate, FormFieldTextarea, FormFieldTitle, FormFieldOption } from '@/Components/Form'
 import LoanerItem from './LoanerItem'
 
 export default function CreateTask({allLoaners, customers, users}) {
