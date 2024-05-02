@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import {useState} from 'react'
 
 export default function TableNavigation({max, page, currentPage, setCurrentPage}) {
 
@@ -20,10 +20,10 @@ export default function TableNavigation({max, page, currentPage, setCurrentPage}
             </a>
         </li>
             {
-            page.map((x) => 
+                page.map((x) => { x < 5 &&
                 <li key={x}>
                     <a key={x} href="#" onClick={() => setCurrentPage(x)} className={"flex items-center justify-center text-sm py-2 px-3 leading-tight border border-gray-300 hover:bg-gray-100 hover:text-gray-700  dark:hover:bg-gray-700 dark:hover:text-white" + (x == currentPage ? "text-primary-600 bg-primary-50 border-gray-700 dark:bg-gray-700 dark:text-white" : "text-gray-500 bg-white dark:border-gray-700 dark:text-gray-400 dark:bg-gray-800")}>{x+1}</a>
-                </li>
+                </li>}
             )}
 
         <li>

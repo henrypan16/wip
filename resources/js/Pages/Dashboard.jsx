@@ -2,6 +2,7 @@ import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head } from '@inertiajs/react';
 import { useForm } from '@inertiajs/react'
 import { useContext, useState, useEffect, useRef, useLayoutEffect } from 'react';
+import { createPortal } from 'react-dom'
 import TaskCard from '../Components/Dashboard/TaskCard'
 import TaskSection from '../Components/Dashboard/TaskSection'
 import LoanerCard from '../Components/Dashboard/LoanerCard'
@@ -22,7 +23,7 @@ function useWindowSize() {
 
 export default function Dashboard({tasks, loaners}) {
     const [selectedTask, setSelectedTask] = useState(0);
-    const [maxTask, setMaxTask] = useState(8);
+    const [maxTask, setMaxTask] = useState(7);
     const [detail, setDetail] = useState({});
     const { data, setData, patch } = useForm({
         status_id: 0
@@ -42,18 +43,13 @@ export default function Dashboard({tasks, loaners}) {
     }, [data])
 
     useEffect(() => {
-        if(width < 900)
-        {
-            setMaxTask(3)
-        }
-        else if(width < 1450)
-        {
-            setMaxTask(5)
-        }
-        else
-        {
-            setMaxTask(8)
-        }
+        if(width > 1423) setMaxTask(8)
+        else if(width > 1280) setMaxTask(7)
+        else if(width > 1024) setMaxTask(11)
+        else if(width > 872) setMaxTask(8)
+        else if(width > 768) setMaxTask(7)
+        else if(width > 600) setMaxTask(8)
+        else setMaxTask(7)
     }, [width])
     
 
@@ -77,21 +73,24 @@ export default function Dashboard({tasks, loaners}) {
         <>
       
             <Head title="Dashboard" />
-            <div className="flex divide-x-2 dark:divide-gray-800 mb-24">
-                <TaskSection tasks={tasks.filter((task) => task.status_id == 5).slice(0,maxTask)} click={handleClick} title="Ready To Go"/>
-                <TaskSection tasks={tasks.filter((task) => task.status_id < 5).slice(0,maxTask)} click={handleClick} title="Not Ready"/>
-            </div>
-            <div className="hidden md:block">
-                <h1 className="text-lg text-gray-900 dark:text-white mb-2">Loaner Status:</h1>
-                <div className="flex">
-                    <LoanerSection loaners={loaners.filter((loaner) => loaner.category_id == 9)} title="Backpack Computers"/>
-                    <LoanerSection loaners={loaners.filter((loaner) => loaner.category_id == 1)} title="Tower Computers"/>
-                    <LoanerSection loaners={loaners.filter((loaner) => loaner.category_id == 3)} title="Laser Printers"/>
-                    <LoanerSection loaners={loaners.filter((loaner) => loaner.category_id == 5)} title="Thermal Printers"/>
+            <div className="flex flex-col h-full mx-10 mt-0">
+                <div className="xl:flex dark:divide-gray-800 mb-4">
+                    <TaskSection tasks={tasks.filter((task) => task.status_id == 5).slice(0,maxTask)} click={handleClick} title="Ready To Go"/>
+                    <TaskSection tasks={tasks.filter((task) => task.status_id < 5).slice(0,maxTask)} click={handleClick} title="Not Ready"/>
+                </div>
+                <div className="hidden xl:block">
+                    <h1 className="text-lg text-gray-900 dark:text-white">Loaner Status:</h1>
+                    <div className="flex w-11/12">
+                        <LoanerSection loaners={loaners.filter((loaner) => loaner.category_id == 9)} title="Backpack Computers"/>
+                        <LoanerSection loaners={loaners.filter((loaner) => loaner.category_id == 1)} title="Tower Computers"/>
+                        <LoanerSection loaners={loaners.filter((loaner) => loaner.category_id == 3)} title="Laser Printers"/>
+                        <LoanerSection loaners={loaners.filter((loaner) => loaner.category_id == 5)} title="Thermal Printers"/>
+                    </div>
                 </div>
             </div>
 
-                <div id="defaultModal" tabIndex="-1" aria-hidden="true" className="fixed top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
+
+                {createPortal(<div id="defaultModal" tabIndex="-1" aria-hidden="true" className="absolute top-0 left-0 right-0 z-50 hidden w-full p-4 overflow-x-hidden overflow-y-auto md:inset-0 h-[calc(100%-1rem)] max-h-full">
                     <div className="relative w-full max-w-2xl max-h-full">
                         {/* <!-- Modal content --> */}
                         <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
@@ -133,7 +132,7 @@ export default function Dashboard({tasks, loaners}) {
                             </div>
                         </div>
                     </div>
-                </div>
+                </div>, document.body)}
         {/*</AuthenticatedLayout*>*/}
         </>
     );

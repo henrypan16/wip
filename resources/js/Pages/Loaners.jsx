@@ -1,18 +1,18 @@
-import React from 'react'
+
 import { Head } from '@inertiajs/react';
 import { useState, useEffect, useReducer } from 'react'
 import Table from '../Components/Table/Table'
 
 export default function Loaners({loaners}) {
     const [currentPage, setCurrentPage] = useState(0);
-    const [, forceUpdate] = useReducer(x => x + 1, 0);
+
     const config = {
         'search': true,
         'button': 0,
         'checkbox': {'enable': false},
         'comboDropbox': {'enable': true},
         'optionDropbox': {'enable': true},
-        'width' : ['0', '64', '64', '32']
+        'width' : ['0', '0', '0', '0']
     }
     let statusDict = new Map([
         ['0', 'Available'],
@@ -24,7 +24,7 @@ export default function Loaners({loaners}) {
             'id': loaner.id,
             'name': loaner.name,
             'category': loaner.category,
-            'status': statusDict[loaner.Status]
+            'status': statusDict.get(loaner.status)
         }
     });
 

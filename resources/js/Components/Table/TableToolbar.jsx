@@ -1,9 +1,9 @@
-import React from 'react'
+
 import TableSearchBar from './TableSearchBar'
 
-export default function TableToolbar({config}) {
+export default function TableToolbar({config, search, setSearch}) {
     return (<div className="flex flex-col md:flex-row items-center justify-between space-y-3 md:space-y-0 md:space-x-4 p-4">
-    {config.search && <TableSearchBar />}
+    {config.search.enable && <TableSearchBar search={search} setSearch={setSearch}/>}
     <div className="w-full md:w-auto flex flex-col md:flex-row space-y-2 md:space-y-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
         {config.checkbox.enable && <div className="flex items-center">
                         <input id="misc" type="checkbox" value="" className="w-4 h-4 bg-gray-100 border-gray-300 rounded text-primary-600 focus:ring-primary-500 dark:focus:ring-primary-600 dark:ring-offset-gray-700 focus:ring-2 dark:bg-gray-600 dark:border-gray-500"/>

@@ -1,4 +1,4 @@
-import React, {useState} from 'react'
+import {useState} from 'react'
 
 export default function TableData({data, width}) {
     let statusDict = new Map([

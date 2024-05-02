@@ -24,11 +24,11 @@ class TaskController extends Controller
             ->addSelect([
                 'loaner' => Loaner::select('name')->whereColumn('id', 'tasks.id')
             ])
-            ->get();
-
+            ->paginate(10);
+        
         return Inertia::render('Tasks', [
             'tasks' => $tasks
-]);
+        ]);
         //
     }
 

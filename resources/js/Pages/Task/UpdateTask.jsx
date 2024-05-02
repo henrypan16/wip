@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { Link, Head } from '@inertiajs/react';
 import { useState, useContext, useRef, useEffect} from 'react';
 import { router } from '@inertiajs/react'
