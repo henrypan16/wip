@@ -24,6 +24,7 @@ class TaskController extends Controller
             ->addSelect([
                 'loaner' => Loaner::select('name')->whereColumn('id', 'tasks.id')
             ])
+            ->orderBy('id','desc')
             ->paginate(10);
         
         return Inertia::render('Tasks', [
@@ -94,7 +95,21 @@ class TaskController extends Controller
      */
     public function show(string $id)
     {
-
+        $tasks = Task::where('customer_id','LIKE', "%$id%")
+            ->orWhere('customer_name','LIKE', "%$id%")
+            ->orWhere('service_order','LIKE', "%$id%")
+            ->orWhere('problem','LIKE', "%$id%")
+            ->orWhere('note','LIKE', "%$id%")
+            ->select('id', 'customer_id', 'customer_name', 'service_order', 'problem', 'note')
+            ->addSelect([
+                'loaner' => Loaner::select('name')->whereColumn('id', 'tasks.id')
+            ])
+            ->orderBy('id','desc')
+            ->paginate(10);
+        
+        return Inertia::render('Tasks', [
+            'tasks' => $tasks
+        ]);
         //
     }
 

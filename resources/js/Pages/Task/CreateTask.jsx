@@ -1,12 +1,13 @@
 import { Link, Head } from '@inertiajs/react';
 import { useState, useEffect } from 'react';
-import { useForm } from '@inertiajs/react'
+import { useForm, usePage } from '@inertiajs/react'
 import LoanerSelection from './LoanerSelection'
 import { format } from 'date-fns'
 import { FormField, FormFieldDate, FormFieldTextarea, FormFieldTitle, FormFieldOption } from '@/Components/Form'
 import LoanerItem from './LoanerItem'
 
 export default function CreateTask({allLoaners, customers, users}) {
+    const {auth} = usePage().props;
     const TODAY = format(new Date(), 'dd/MM/yyyy')
     const [all, setAll] = useState(allLoaners);
     const [pharmacy, setPharmacy] = useState('');
@@ -14,7 +15,7 @@ export default function CreateTask({allLoaners, customers, users}) {
     const { data, setData, post, processing, errors } = useForm({
         customer_id: '',
         customer_name: '',
-        user_id: 1,
+        user_id: auth.id,
         service_order: '',
         title: '',
         date: TODAY,
@@ -25,7 +26,7 @@ export default function CreateTask({allLoaners, customers, users}) {
         status_id: 1,
         type_id: 1
     })
-    
+    console.log(auth);
     useEffect(() => {
         setData('date', date)
     },[date])
@@ -65,26 +66,59 @@ export default function CreateTask({allLoaners, customers, users}) {
     }
 
   return (
-    <div className="dark:bg-gray-900 px-5 sm:px-10 md:px-0 lg:px-18 2xl:px-60 pt-12">
+    <div className="dark:bg-gray-900  sm:px-10 md:px-0 lg:px-18 2xl:px-60 pt-12 px-2">
         <Head title="New Task"></Head>
         
-        <form onSubmit={submit}>
-            <div className="grid gap-4 mb-4 sm:grid-cols-18">
-                <div className="sm:col-span-8 mb-6 flex items-center">
+        <form onSubmit={submit} className="w-full">
+            <div className="grid gap-4 mb-4 grid-cols-8">
+                <div className="col-span-full sm:col-span-4 mb-6 flex items-center">
                     <span className="text-3xl text-bold dark:text-white">Create New Task</span>
                 </div>
-                <FormFieldTitle onChange={e => setData('title', e.target.value)} placeholder="Title" value={data.title}/>
-                <FormField onChange={e => setData('customer_id', ('000' + e.target.value).slice(-4))} formfields={{id:"customer_id", colspan:"sm:col-span-4", type:"number", placeholder:"Customer ID", required:true, value:data.customer_id}}/>
-                <FormField onChange={e => setData('service_order', ('00000' + e.target.value).slice(-6))} formfields={{id:"service_order", colspan:"sm:col-span-6", type:"number", placeholder:"Service Order", required:true, value:data.service_order}}/>
-                <FormFieldDate value={date} id="date" colspan="sm:col-span-4" onChange={e => setDate(e.target.value)} placeholder="Receive Date"/>
-                <FormFieldOption id="user" colspan="sm:col-span-4" value={data.user_id} onChange={e => setData('user_id', e.target.value)} placeholder="Technician" users={users} required={true}/>
-                <FormField onChange={e => setData('customer_name', e.target.value)} formfields={{id:"Pharmacy's Name", colspan:"sm:col-span-full", type:"number", placeholder:"Customer's Name", required:true, value:data.customer_name}}/>
-                <FormField onChange={e => setData('equipment', e.target.value)} formfields={{id:"service_order", colspan:"sm:col-span-full", type:"number", placeholder:"Equipment", required:true, value:data.equipment}}/>
-                <FormField onChange={e => setData('problem', e.target.value)} formfields={{id:"service_order", colspan:"sm:col-span-full", type:"number", placeholder:"Problem", required:true, value:data.problem}}/>
-                <FormFieldTextarea onChange={e => setData('note', e.target.value)} id="note" colspan="sm:col-span-full" type="textarea" placeholder="Note" required={true} value={data.note} row={3}/>                
-                <LoanerSelection addLoaner={addLoaner} allLoaners={all}/>
+                <div className="col-span-full sm:col-span-4">
+                    <FormField  value={data.customer_id} type="title"
+                                onChange={e => setData('customer_id', ('000' + e.target.value).slice(-4))}
+                                placeholder="Customer ID"/>
+                </div>
+                <div className="col-span-2">
+                    <FormField  value={data.customer_id} type="number"
+                                onChange={e => setData('customer_id', ('000' + e.target.value).slice(-4))}
+                                placeholder="Customer ID"/>
+                </div>
+                <div className="col-span-3">
+                    <FormField  value={data.service_order} type="number"
+                                onChange={e => setData('service_order', ('00000' + e.target.value).slice(-6))}
+                                placeholder="Number"/>
+                </div>   
+                <div className="col-span-3">
+                    <FormField value={date} type="date" id="date"
+                               onChange={e => setDate(e.target.value)}
+                               placeholder="Receive Date"/>
+                </div>
+                <div className="col-span-full">
+                    <FormField  value={data.customer_name} type="text"
+                                onChange={e => setData('customer_name', e.target.value)}
+                                placeholder="Customer's Name"/>
+                </div>
+                <div className="col-span-full">
+                    <FormField  value={data.equipment} type="text"
+                                onChange={e => setData('equipment', e.target.value)}
+                                placeholder="Equipment"/>
+                </div>
+                <div className="col-span-full">
+                    <FormField  value={data.problem} type="text"
+                                onChange={e => setData('problem', e.target.value)}
+                                placeholder="Problem"/>
+                </div>
+                <div className="col-span-full">
+                    <FormField  value={data.note} type="textarea"
+                                onChange={e => setData('note', e.target.value)}
+                                placeholder="Note"/> 
+                </div>       
+                <div className="col-span-full flex sm:grid sm:grid-cols-12 gap-2">
+                    <LoanerSelection addLoaner={addLoaner} allLoaners={all}/>
+                </div>
                 
-                <div className="flex flex-wrap col-span-full">
+                <div className="flex col-span-full">
                         {data.loaners.map((loaner) =>
                             <LoanerItem key={loaner.id} removeLoaner={removeLoaner} loaner={loaner}  />)}
                 </div>

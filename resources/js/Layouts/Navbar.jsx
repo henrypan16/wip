@@ -8,12 +8,12 @@ export default function Navbar({}) {
                 <ToggleSidebar/>
                 <div className="flex justify-start items-center">
                     <a href="/dashboard" className="flex items-center justify-between mr-4">
-                        <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">Resource Department</span>
+                        <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white ">Resource Department</span>
+                        <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white hidden">RSS</span>
                     </a>
                     <Search/>
                 </div>
                 <Profile/>
             </div>
-
         </nav>);
   }

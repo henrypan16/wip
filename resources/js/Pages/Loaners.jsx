@@ -7,7 +7,7 @@ export default function Loaners({loaners}) {
     const [currentPage, setCurrentPage] = useState(0);
 
     const config = {
-        'search': true,
+        'search': {'enable': true},
         'button': 0,
         'checkbox': {'enable': false},
         'comboDropbox': {'enable': true},
@@ -31,7 +31,7 @@ export default function Loaners({loaners}) {
     const page = Array.from(Array(Math.ceil(loaners.length/10)).keys());
     
     return (
-        <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5">
+        <section className="bg-gray-50 dark:bg-gray-900 p-3 sm:p-5 pt-10 ">
             <Head title="All Loaners"/>
             <div className="mx-auto max-w-screen-xl px-4 lg:px-12">
                 {/* <!-- Start coding here --> */}

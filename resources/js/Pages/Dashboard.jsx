@@ -56,7 +56,7 @@ export default function Dashboard({tasks, loaners}) {
     useEffect(() => {
         const modalEl = document.getElementById('defaultModal');
         const options = {
-            backdropClasses: 'bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0 z-40',
+            backdropClasses: 'bg-gray-900 bg-opacity-50 dark:bg-opacity-80 fixed inset-0',
             closable: true,
         }
         inputElement.current = new Modal(modalEl, options)
@@ -70,7 +70,7 @@ export default function Dashboard({tasks, loaners}) {
     }
 
     return (
-        <>
+        <div className="overflow-auto">
       
             <Head title="Dashboard" />
             <div className="flex flex-col h-full mx-10 mt-0">
@@ -134,6 +134,6 @@ export default function Dashboard({tasks, loaners}) {
                     </div>
                 </div>, document.body)}
         {/*</AuthenticatedLayout*>*/}
-        </>
+        </div>
     );
 }

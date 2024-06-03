@@ -1,11 +1,26 @@
 
 import { useForm } from '@inertiajs/react'
+import {useRef, useEffect} from 'react'
+import { Dropdown } from 'flowbite'
 
 export default function LoanerCard({loaner}) {
   const { data, setData, patch } = useForm({
     note: loaner.note
   })
-  
+  const dropdownEl = useRef();
+
+  useEffect(() => {
+    const targetEl = document.getElementById('dropdown'+ loaner.id)
+    const triggerEl = document.getElementById('trigger'+ loaner.id)
+    const options = {
+      placement: 'bottom',
+      triggerType: 'hover',
+      delay: 200
+    }
+    dropdownEl.current = new Dropdown(targetEl, triggerEl, options)
+  }
+  , [])
+
   function handleOnClick() {
     console.log(data.note);
     patch(`/loaner/${loaner.id}`)
@@ -13,7 +28,7 @@ export default function LoanerCard({loaner}) {
   
   return (
     <>
-      <a data-dropdown-toggle={'dropdown'+ loaner.id} data-dropdown-trigger="hover" data-dropdown-delay="100" className="w-28 mr-2 mb-2 block p-3 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 overflow-hidden">
+      <a id={'trigger'+ loaner.id} className="w-28 mr-2 mb-2 block p-3 bg-white border border-gray-200 rounded-lg shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700 overflow-hidden">
           <h1 className="mb-2 text-md font-bold tracking-tight text-gray-900 dark:text-white">
           <span className="text-sm text-gray-700 dark:text-gray-400">
               {loaner.name}
