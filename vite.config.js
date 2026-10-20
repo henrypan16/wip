@@ -1,14 +1,11 @@
-import { defineConfig } from 'vite';
-import laravel from 'laravel-vite-plugin';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from "vite";
+import laravel from "laravel-vite-plugin";
+import react from "@vitejs/plugin-react";
 
 export default defineConfig({
-    plugins: [
-        laravel(['resources/js/app.jsx']),
-        react(),
-    ],
-    // server: {
-    //     host: true,
-    //     hmr: { host: '172.16.0.103' }
-    // }
+	plugins: [react()],
+	// server: {
+	//     host: true,
+	//     hmr: { host: '172.16.0.103' }
+	// }
 });
