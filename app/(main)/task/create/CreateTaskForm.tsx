@@ -3,15 +3,15 @@
 import { type FormEvent, useState, useTransition } from 'react';
 import { createTask } from '@/actions/tasks';
 import { FormField, UserSelect } from '@/components/Form';
-import LoanerPicker, { type SelectedLoaner } from '@/components/LoanerPicker';
+import LoanerPicker from '@/components/LoanerPicker';
 import { FormActions, FormColumn, FormColumns, FormPage, FormSection } from '@/components/TaskFormLayout';
 import useCustomerLookup from '@/components/useCustomerLookup';
 import { padDigits, SERVICE_ORDER_DIGITS, today } from '@/lib/format';
-import type { ActionResult, FormErrors, Loaner, User } from '@/lib/types';
+import type { ActionResult, Category, FormErrors, Loaner, LoanerGroupLink, User } from '@/lib/types';
 
-type CreateTaskFormProps = { allLoaners: Loaner[]; users: User[]; currentUserId: number };
+type CreateTaskFormProps = { allLoaners: Loaner[]; groups: LoanerGroupLink[]; categories: Category[]; users: User[]; currentUserId: number };
 
-export default function CreateTaskForm({ allLoaners, users, currentUserId }: CreateTaskFormProps) {
+export default function CreateTaskForm({ allLoaners, groups, categories, users, currentUserId }: CreateTaskFormProps) {
     const [errors, setErrors] = useState<FormErrors>({});
     const [processing, startTransition] = useTransition();
     const [data, setFormData] = useState({
@@ -23,7 +23,7 @@ export default function CreateTaskForm({ allLoaners, users, currentUserId }: Cre
         equipment: '',
         problem: '',
         note: '',
-        loaners: [] as SelectedLoaner[],
+        loaners: [] as Loaner[],
     });
     const setData = <K extends keyof typeof data>(key: K, value: (typeof data)[K]) => setFormData((d) => ({ ...d, [key]: value }));
 
@@ -34,7 +34,7 @@ export default function CreateTaskForm({ allLoaners, users, currentUserId }: Cre
         startTransition(async () => {
             const result: ActionResult | undefined = await createTask({
                 ...data,
-                loaners: data.loaners.map(({ id, note }) => ({ id, note })),
+                loaners: data.loaners.map(({ id }) => id),
             });
             setErrors(result?.errors ?? {});
         });
@@ -69,7 +69,7 @@ export default function CreateTaskForm({ allLoaners, users, currentUserId }: Cre
 
                     <FormSection title="Loaners" description="Optional">
                         <div className="sm:col-span-full">
-                            <LoanerPicker choices={allLoaners} selected={data.loaners} error={errors.loaners}
+                            <LoanerPicker choices={allLoaners} selected={data.loaners} serviceOrder={data.service_order} groups={groups} categories={categories} error={errors.loaners}
                                 onChange={(loaners) => setData('loaners', loaners)} />
                         </div>
                     </FormSection>

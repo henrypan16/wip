@@ -43,7 +43,7 @@ export default function TableNavigation({ total, pageSize, currentPage, hrefForP
     };
 
     return (
-        <nav className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-3 md:space-y-0 p-4" aria-label="Table navigation">
+        <nav className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 px-4 py-3 border-t border-gray-200 dark:border-gray-700" aria-label="Table navigation">
             <span className="text-sm font-normal text-gray-500 dark:text-gray-400">
                 Showing <span className="font-semibold text-gray-900 dark:text-white">{from} - {to}</span> of{' '}
                 <span className="font-semibold text-gray-900 dark:text-white">{total}</span>

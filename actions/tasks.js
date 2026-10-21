@@ -2,10 +2,11 @@
 
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
-import { LOANER_AVAILABLE, STATUS } from '@/lib/constants';
+import { STATUS } from '@/lib/constants';
 import { getLoanersByIds, getTaskLoaners } from '@/lib/data/loaners';
 import * as tasks from '@/lib/data/tasks';
 import { getUsers } from '@/lib/data/users';
+import { loanerPick, loanerServiceOrder } from '@/lib/format';
 import { requireUser } from '@/lib/session';
 import { collect, first, isoDate, maxLength, required, text } from '@/lib/validation';
 
@@ -31,22 +32,24 @@ async function receivingUser(value, optional) {
 const USER_ERROR = 'Please select who received the task.';
 
 /**
- * Re-read the chosen loaners so names, categories and availability come from
- * the database, keeping the note each one was chosen with.
+ * Re-read the chosen loaners (by ID) so names, categories and state come from
+ * the database. Each must be available, or in use under this same service order.
  * @returns {Promise<{loaners?: object[], error?: string}>}
  */
-async function availableLoaners(selected) {
-    const records = await getLoanersByIds(selected.map((l) => Number(l.id)).filter(Number.isInteger));
-    if (records.length !== selected.length || records.some((l) => l.status !== LOANER_AVAILABLE)) {
-        return { error: 'One of the selected loaners is no longer available. Please reload and choose again.' };
+async function lendableLoaners(ids, serviceOrder) {
+    const records = await getLoanersByIds(ids);
+    if (records.length !== ids.length) {
+        return { error: 'One of the selected loaners no longer exists. Please reload and choose again.' };
     }
-    return {
-        loaners: records.map((l) => ({
-            ...l,
-            note: text(selected.find((s) => Number(s.id) === l.id)?.note).slice(0, 255),
-        })),
-    };
+    const blocked = records.filter((l) => !['available', 'match'].includes(loanerPick(l, serviceOrder)));
+    if (blocked.length) {
+        return { error: `${blocked.map((l) => l.name).join(', ')} ${blocked.length === 1 ? 'is' : 'are'} in use under another SO#. Remove ${blocked.length === 1 ? 'it' : 'them'} or check the service order.` };
+    }
+    return { loaners: records };
 }
+
+/** The loaner IDs a form sent. */
+const loanerIds = (value) => [...new Set((Array.isArray(value) ? value : []).map(Number).filter(Number.isInteger))];
 
 export async function createTask(data) {
     await requireUser();
@@ -69,7 +72,7 @@ export async function createTask(data) {
     });
     if (errors) return { errors };
 
-    const { loaners, error } = await availableLoaners(Array.isArray(data.loaners) ? data.loaners : []);
+    const { loaners, error } = await lendableLoaners(loanerIds(data.loaners), task.service_order);
     if (error) return { errors: { loaners: error } };
 
     await tasks.createTask(task, loaners, userId);
@@ -82,8 +85,17 @@ export async function updateTask(id, data) {
     const current = await tasks.getTask(Number(id));
     if (!current) return { errors: { equipment: 'This task no longer exists.' } };
 
+    // A completed task is closed: only its note can still be changed.
+    if (current.status_id === STATUS.COMPLETE) {
+        const note = text(data.note);
+        const noteError = maxLength(note, 255, 'note');
+        if (noteError) return { errors: { note: noteError } };
+        await tasks.updateTaskNote(current.id, note);
+        revalidatePath('/', 'layout');
+        redirect('/dashboard');
+    }
+
     const task = {
-        customer_id: current.customer_id,
         equipment: text(data.equipment),
         problem: text(data.problem),
         note: text(data.note),
@@ -99,21 +111,20 @@ export async function updateTask(id, data) {
     if (errors) return { errors };
 
     // Compare the submitted loaners with the ones linked now: new ones must be
-    // available; removed ones go back to the pool if still out with this customer.
-    const selected = Array.isArray(data.loaners) ? data.loaners : [];
-    const selectedIds = new Set(selected.map((l) => Number(l.id)));
+    // lendable; removed ones go back to the pool if still out under this task's SO#.
+    const selectedIds = new Set(loanerIds(data.loaners));
     const linked = await getTaskLoaners(current.id);
     const linkedIds = new Set(linked.map((l) => l.id));
     const kept = linked.filter((l) => selectedIds.has(l.id));
-    const { loaners: added, error } = await availableLoaners(selected.filter((l) => !linkedIds.has(Number(l.id))));
+    const { loaners: added, error } = await lendableLoaners([...selectedIds].filter((id) => !linkedIds.has(id)), task.service_order);
     if (error) return { errors: { loaners: error } };
 
-    const outWithCustomer = (loaner) => loaner.status === current.customer_id;
+    const outWithTask = (loaner) => Boolean(current.service_order) && loanerServiceOrder(loaner) === current.service_order;
     await tasks.updateTask(current.id, task, {
         loaners: [...kept, ...added],
         added,
-        removed: linked.filter((l) => !selectedIds.has(l.id)).map((l) => ({ id: l.id, release: outWithCustomer(l) })),
-        held: task.service_order !== current.service_order ? kept.filter(outWithCustomer).map((l) => l.id) : [],
+        removed: linked.filter((l) => !selectedIds.has(l.id)).map((l) => ({ id: l.id, release: outWithTask(l) })),
+        held: task.service_order !== current.service_order ? kept.filter(outWithTask).map((l) => l.id) : [],
     });
     revalidatePath('/', 'layout');
     redirect('/dashboard');

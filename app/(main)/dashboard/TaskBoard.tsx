@@ -9,7 +9,6 @@ import StatusBadge from "@/components/StatusBadge";
 import { STATUS } from "@/lib/constants";
 import { age, formatDate, padCustomerId } from "@/lib/format";
 import type { Task } from "@/lib/types";
-import { saveLoanerNote } from "@/actions/loaners";
 
 type Panel = "pending" | "ready" | "loaners";
 

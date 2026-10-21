@@ -40,7 +40,7 @@ const migrations = [
 	{
 		name: "003_loaners_category_id",
 		// Loaners.CategoryID was created as TEXT; it must be numeric to join Category.ID.
-		// Loaners.Status keeps its meaning: '0' available, '-1' discontinued,
+		// Loaners.Status keeps its meaning (until 012): '0' available, '-1' discontinued,
 		// otherwise the CustomerID currently holding the loaner.
 		sql: [
 			"ALTER TABLE Loaners ALTER COLUMN CategoryID LONG NOT NULL",
@@ -216,6 +216,141 @@ const migrations = [
 				}),
 			),
 		],
+	},
+	{
+		name: "011_widen_loaner_status",
+		// Loaners.Status is about to hold service order numbers, which need more
+		// than 4 characters. The index has to be dropped to change the column.
+		sql: [
+			"DROP INDEX IX_Loaners_Status ON Loaners",
+			"ALTER TABLE Loaners ALTER COLUMN Status TEXT(10)",
+			"CREATE INDEX IX_Loaners_Status ON Loaners (Status)",
+		],
+	},
+	{
+		name: "012_merge_loaner_note_into_status",
+		// Loaners.Status now holds everything: blank (NULL) available, '-1'
+		// discontinued, otherwise the service order number the loaner is out
+		// with. That number used to be in Note (sometimes as 'SO#123456') while
+		// Status held '0' or the customer ID.
+		sql: [
+			`UPDATE Loaners
+			 SET Status = IIf(Len(Trim([Note] & '')) = 0, NULL,
+			                  Left(IIf(Left(Trim([Note]), 3) = 'SO#', Mid(Trim([Note]), 4), Trim([Note])), 10))
+			 WHERE Status <> '-1'`,
+		],
+	},
+	{
+		name: "013_drop_loaner_note",
+		sql: ["ALTER TABLE Loaners DROP COLUMN [Note]"],
+	},
+	{
+		name: "014_create_loaner_groups",
+		// Loaners that go out together: one row per accessory, linked to the
+		// group's main item. An accessory belongs to at most one group.
+		sql: [
+			`CREATE TABLE LoanerGroups (
+				ID COUNTER CONSTRAINT PK_LoanerGroups PRIMARY KEY,
+				MainLoanerID LONG NOT NULL CONSTRAINT FK_LoanerGroups_Main REFERENCES Loaners (ID),
+				AccessoryLoanerID LONG NOT NULL CONSTRAINT FK_LoanerGroups_Accessory REFERENCES Loaners (ID)
+			)`,
+			"CREATE UNIQUE INDEX UX_LoanerGroups_Accessory ON LoanerGroups (AccessoryLoanerID)",
+			"CREATE INDEX IX_LoanerGroups_Main ON LoanerGroups (MainLoanerID)",
+		],
+	},
+	{
+		name: "015_seed_power_adapters_and_groups",
+		// A power adapter for each computer, document scanner and thermal printer,
+		// numbered like its device and grouped with it. Each adapter starts in
+		// the same state as its device. Laser printers are grouped with the
+		// supplies of the same number.
+		sql: (() => {
+			const adapters = [
+				...["A", "B", "C", "D", "E", "F", "X"].map((n) => [`BP PC #${n}`, `BP Power Adapter #${n}`]),
+				...["1", "2", "3", "4", "5"].map((n) => [`BL PC #${n}`, `BL Power Adapter #${n}`]),
+				...["1", "2"].map((n) => [`PS283 #${n}`, `PS283 Power Adapter #${n}`]),
+				["PS188 #1", "PS188 Power Adapter #1"],
+				...["1A", "1B"].map((n) => [`GK420d #${n}`, `GK420d Power Adapter #${n}`]),
+				...["2A", "2B", "3A", "3B", "4A", "4B"].map((n) => [`Tigra v1 #${n}`, `Tigra v1 Power Adapter #${n}`]),
+			];
+			const supplies = Array.from({ length: 10 }, (_, i) => String(i + 1).padStart(2, "0")).flatMap((n) =>
+				["Toner", "Imaging Unit", "Maintenance Kit"].map((supply) => [`MS811 #${n}`, `${supply} #${n}`]),
+			);
+			// Jet ignores `?` inside these subqueries, so keep the params outside them.
+			const createAdapter = ([device, adapter]) => ({
+				sql: `INSERT INTO Loaners (Loaner, CategoryID, Status)
+				      SELECT ?, c.ID, d.Status FROM Category AS c, Loaners AS d
+				      WHERE c.Name = 'Power Adapter' AND d.Loaner = ? AND ? NOT IN (SELECT Loaner FROM Loaners)`,
+				params: [adapter, device, adapter],
+			});
+			const link = ([main, accessory]) => ({
+				sql: `INSERT INTO LoanerGroups (MainLoanerID, AccessoryLoanerID)
+				      SELECT m.ID, a.ID FROM Loaners AS m, Loaners AS a
+				      WHERE m.Loaner = ? AND a.Loaner = ? AND a.ID NOT IN (SELECT AccessoryLoanerID FROM LoanerGroups)`,
+				params: [main, accessory],
+			});
+			return [...adapters.map(createAdapter), ...adapters.map(link), ...supplies.map(link)];
+		})(),
+	},
+	{
+		name: "016_seed_hubs_modems_monitors_cables",
+		// Five each of USB hubs, fax modems and monitors; each monitor grouped
+		// with its own power adapter. A new Cables category with a USB cable for
+		// each thermal printer, grouped with that printer.
+		sql: (() => {
+			const numbers = ["1", "2", "3", "4", "5"];
+			const thermal = ["GK420d #1A", "GK420d #1B", "Tigra v1 #2A", "Tigra v1 #2B", "Tigra v1 #3A", "Tigra v1 #3B", "Tigra v1 #4A", "Tigra v1 #4B"];
+			const loaners = [
+				...numbers.map((n) => ["USB Hub", `USB Hub #${n}`]),
+				...numbers.map((n) => ["USB Fax Modem", `USB Fax Modem #${n}`]),
+				...numbers.map((n) => ["Monitor", `Monitor #${n}`]),
+				...numbers.map((n) => ["Power Adapter", `Monitor Power Adapter #${n}`]),
+				...thermal.map((printer) => ["Cables", printer.replace(" #", " USB Cable #")]),
+			];
+			const groups = [
+				...numbers.map((n) => [`Monitor #${n}`, `Monitor Power Adapter #${n}`]),
+				...thermal.map((printer) => [printer, printer.replace(" #", " USB Cable #")]),
+			];
+			// Jet ignores `?` inside these subqueries, so keep the params outside them.
+			return [
+				{
+					// Jet mis-binds a second `?` in the SELECT list, so Active is a literal.
+					sql: "INSERT INTO Category (Name, Active) SELECT ?, True FROM (SELECT COUNT(*) FROM Category) WHERE NOT EXISTS (SELECT 1 FROM Category WHERE Name = ?)",
+					params: ["Cables", "Cables"],
+				},
+				...loaners.map(([category, name]) => ({
+					sql: `INSERT INTO Loaners (Loaner, CategoryID)
+					      SELECT ?, c.ID FROM Category AS c
+					      WHERE c.Name = ? AND ? NOT IN (SELECT Loaner FROM Loaners)`,
+					params: [name, category, name],
+				})),
+				...groups.map(([main, accessory]) => ({
+					sql: `INSERT INTO LoanerGroups (MainLoanerID, AccessoryLoanerID)
+					      SELECT m.ID, a.ID FROM Loaners AS m, Loaners AS a
+					      WHERE m.Loaner = ? AND a.Loaner = ? AND a.ID NOT IN (SELECT AccessoryLoanerID FROM LoanerGroups)`,
+					params: [main, accessory],
+				})),
+			];
+		})(),
+	},
+	{
+		name: "017_seed_monitor_hdmi_cables",
+		// An HDMI cable for each monitor, numbered like it and grouped with it.
+		sql: ["1", "2", "3", "4", "5"].flatMap((n) => [
+			{
+				// Jet ignores `?` inside the subquery here, so keep the params outside it.
+				sql: `INSERT INTO Loaners (Loaner, CategoryID)
+				      SELECT ?, c.ID FROM Category AS c
+				      WHERE c.Name = 'Cables' AND ? NOT IN (SELECT Loaner FROM Loaners)`,
+				params: [`Monitor HDMI Cable #${n}`, `Monitor HDMI Cable #${n}`],
+			},
+			{
+				sql: `INSERT INTO LoanerGroups (MainLoanerID, AccessoryLoanerID)
+				      SELECT m.ID, a.ID FROM Loaners AS m, Loaners AS a
+				      WHERE m.Loaner = ? AND a.Loaner = ? AND a.ID NOT IN (SELECT AccessoryLoanerID FROM LoanerGroups)`,
+				params: [`Monitor #${n}`, `Monitor HDMI Cable #${n}`],
+			},
+		]),
 	},
 ];
 

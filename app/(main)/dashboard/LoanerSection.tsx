@@ -1,7 +1,8 @@
 "use client";
 
 import { type FormEvent, type ReactNode, useState, useTransition } from "react";
-import { saveLoanerNote } from "@/actions/loaners";
+import { saveLoanerServiceOrder } from "@/actions/loaners";
+import { LOANER_STATES } from "@/components/LoanerStateBadge";
 import {
 	loanerServiceOrder,
 	loanerState,
@@ -103,41 +104,23 @@ export function LoanerGrid({
 	);
 }
 
-const STATE_STYLES = {
-	available: {
-		label: "Available",
-		card: "border-gray-200 bg-gray-50 dark:border-gray-600 dark:bg-gray-700",
-		badge: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300",
-	},
-	used: {
-		label: "Used",
-		card: "border-amber-300 bg-amber-50 dark:border-amber-700 dark:bg-amber-950",
-		badge: "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-300",
-	},
-	discontinued: {
-		label: "Discontinued",
-		card: "border-gray-200 bg-gray-100 opacity-70 dark:border-gray-700 dark:bg-gray-800",
-		badge: "bg-gray-200 text-gray-700 dark:bg-gray-700 dark:text-gray-300",
-	},
-};
-
 // The note is the service order the loaner is out with, shown as SO#000000.
 // Clicking it opens an editor for the number; clearing it makes the loaner available.
 function LoanerCard({ loaner }: { loaner: Loaner }) {
 	const [serviceOrder, setServiceOrder] = useState(
-		loanerServiceOrder(loaner.note),
+		loanerServiceOrder(loaner),
 	);
 	const [editing, setEditing] = useState(false);
 	const [pending, startTransition] = useTransition();
 
 	const state = loanerState(loaner);
-	const style = STATE_STYLES[state];
-	const saved = loanerServiceOrder(loaner.note);
+	const style = LOANER_STATES[state];
+	const saved = loanerServiceOrder(loaner);
 
 	function save(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		startTransition(async () => {
-			await saveLoanerNote(loaner.id, serviceOrder);
+			await saveLoanerServiceOrder(loaner.id, serviceOrder);
 			setEditing(false);
 		});
 	}

@@ -51,9 +51,14 @@ export interface Loaner {
     name: string;
     category_id: number;
     category: string;
-    /** '0' available, '-1' discontinued, otherwise the CustomerID holding it. */
-    status: string;
-    note: string | null;
+    /** Blank (null) when available, '-1' when discontinued, otherwise the SO# it is out with. */
+    status: string | null;
+}
+
+/** One accessory in a loaner group, linked to the group's main item. */
+export interface LoanerGroupLink {
+    main_id: number;
+    accessory_id: number;
 }
 
 export interface Category {

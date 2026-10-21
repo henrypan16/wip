@@ -1,100 +1,198 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import TableData from '@/components/Table/TableData';
-import TableNavigation from '@/components/Table/TableNavigation';
-import TableToolbar, { checkboxClass, FilterIcon, optionLabelClass, PlusIcon, primaryButtonClass, radioClass, TableSearchBar, ToolbarDropdown } from '@/components/Table/TableToolbar';
-import { LOANER_AVAILABLE, LOANER_DISCONTINUED, PAGE_SIZE } from '@/lib/constants';
-import { padCustomerId } from '@/lib/format';
-import type { Category, Loaner } from '@/lib/types';
-import LoanerFormModal from './LoanerFormModal';
+import { useState } from "react";
+import { inputClass } from "@/components/Form";
+import LoanerStateBadge, { LOANER_STATES } from "@/components/LoanerStateBadge";
+import {
+	cardClass,
+	CountPill,
+	FilterPills,
+	ListToolbar,
+	PageHeader,
+	primaryButtonClass,
+} from "@/components/Page";
+import TableData, { type Column } from "@/components/Table/TableData";
+import TableNavigation from "@/components/Table/TableNavigation";
+import TableSearchBar from "@/components/Table/TableSearchBar";
+import { PAGE_SIZE } from "@/lib/constants";
+import { loanerServiceOrder, loanerState } from "@/lib/format";
+import { loanerGroups } from "@/lib/loanerGroups";
+import type { Category, Loaner, LoanerGroupLink } from "@/lib/types";
+import LoanerFormModal from "./LoanerFormModal";
 
-const COLUMNS = [
-    { key: 'name', label: 'Name' },
-    { key: 'category', label: 'Category' },
-    { key: 'status', label: 'Status' },
-    { key: 'note', label: 'Note' },
+const STATE_FILTERS = [
+	{ value: "", label: "All" },
+	...(["available", "used", "discontinued"] as const).map((state) => ({
+		value: state,
+		label: LOANER_STATES[state].label,
+		activeClass: LOANER_STATES[state].badge,
+	})),
 ];
 
-const STATUS_FILTERS = [
-    { value: '', label: 'All' },
-    { value: 'available', label: 'Available' },
-    { value: 'used', label: 'Used' },
-    { value: 'retired', label: 'Retired' },
+// Less important columns drop out on narrower screens. The name shows the
+// loaner's place in a group: the main item it goes with, or its accessory count.
+const columns = (
+	nameOf: (id: number) => string,
+	{ accessoriesOf, mainOf }: ReturnType<typeof loanerGroups>,
+): Column<Loaner>[] => [
+	{
+		key: "name",
+		label: "Name",
+		render: (loaner) => {
+			const mainId = mainOf.get(loaner.id);
+			const count = accessoriesOf.get(loaner.id)?.length ?? 0;
+			return (
+				<>
+					<p className="font-medium text-gray-900 dark:text-white truncate">
+						{loaner.name}
+					</p>
+					{mainId !== undefined && (
+						<p className="text-xs truncate">With {nameOf(mainId)}</p>
+					)}
+					{count > 0 && (
+						<p className="text-xs truncate">
+							Main item · {count} {count === 1 ? "accessory" : "accessories"}
+						</p>
+					)}
+				</>
+			);
+		},
+	},
+	{ key: "category", label: "Category", className: "hidden sm:table-cell" },
+	{
+		key: "service_order",
+		label: "SO#",
+		className: "hidden md:table-cell w-32 font-mono",
+		render: (loaner) =>
+			loanerServiceOrder(loaner) ? `SO#${loanerServiceOrder(loaner)}` : "—",
+	},
+	{
+		key: "status",
+		label: "Status",
+		className: "w-32",
+		render: (loaner) => <LoanerStateBadge loaner={loaner} />,
+	},
 ];
 
-function statusOf(loaner: Loaner) {
-    if (loaner.status === LOANER_AVAILABLE) return 'available';
-    if (loaner.status === LOANER_DISCONTINUED) return 'retired';
-    return 'used';
-}
+export default function LoanersTable({
+	loaners,
+	categories,
+	groups,
+}: {
+	loaners: Loaner[];
+	categories: Category[];
+	groups: LoanerGroupLink[];
+}) {
+	const lookups = loanerGroups(groups);
+	const nameOf = (id: number) => loaners.find((l) => l.id === id)?.name ?? "";
+	const [search, setSearch] = useState("");
+	const [state, setState] = useState("");
+	const [categoryId, setCategoryId] = useState("");
+	const [currentPage, setCurrentPage] = useState(1);
+	// The loaner open in the form: a loaner to edit, null to add one, undefined when closed.
+	const [editing, setEditing] = useState<Loaner | null | undefined>(
+		undefined,
+	);
 
-function statusLabel(loaner: Loaner) {
-    if (loaner.status === LOANER_AVAILABLE) return 'Available';
-    if (loaner.status === LOANER_DISCONTINUED) return 'Discontinued';
-    return `Loaned to ${padCustomerId(loaner.status)}`;
-}
+	const filtered = loaners.filter(
+		(loaner) =>
+			loaner.name.toLowerCase().includes(search.toLowerCase()) &&
+			(!state || loanerState(loaner) === state) &&
+			(!categoryId || String(loaner.category_id) === categoryId),
+	);
+	const lastPage = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+	const page = Math.min(currentPage, lastPage);
+	const rows = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+	const count = (s: string) =>
+		loaners.filter((loaner) => loanerState(loaner) === s).length;
 
-export default function LoanersTable({ loaners, categories }: { loaners: Loaner[]; categories: Category[] }) {
-    const [search, setSearch] = useState('');
-    const [status, setStatus] = useState('');
-    const [hiddenCategories, setHiddenCategories] = useState<string[]>([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    // The loaner open in the form: a loaner to edit, null to add one, undefined when closed.
-    const [editing, setEditing] = useState<Loaner | null | undefined>(undefined);
+	// Any change to the filters starts again from the first page.
+	function filterBy(update: () => void) {
+		update();
+		setCurrentPage(1);
+	}
 
-    const filtered = loaners.filter((loaner) =>
-        loaner.name.toLowerCase().includes(search.toLowerCase())
-        && (!status || statusOf(loaner) === status)
-        && !hiddenCategories.includes(loaner.category));
-    const lastPage = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
-    const page = Math.min(currentPage, lastPage);
-    const rows = filtered
-        .slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE)
-        .map((loaner) => ({ ...loaner, status: statusLabel(loaner) }));
-
-    function filterBy(update: () => void) {
-        update();
-        setCurrentPage(1);
-    }
-
-    function toggleCategory(category: string) {
-        filterBy(() => setHiddenCategories(hiddenCategories.includes(category)
-            ? hiddenCategories.filter((c) => c !== category)
-            : [...hiddenCategories, category]));
-    }
-
-    return (
-        <div className="bg-white dark:bg-gray-800 relative shadow-md sm:rounded-lg">
-            <TableToolbar search={<TableSearchBar value={search} onChange={(value) => filterBy(() => setSearch(value))} />}>
-                <button type="button" onClick={() => setEditing(null)} className={primaryButtonClass}>
-                    {PlusIcon}
-                    Add Loaner
-                </button>
-                <div className="flex items-center space-x-3 w-full md:w-auto">
-                    <ToolbarDropdown label="Status" title="Loaner Status">
-                        {STATUS_FILTERS.map((option) => (
-                            <li key={option.value} className="flex items-center">
-                                <input id={`status-${option.value || 'all'}`} name="status-radio" type="radio" className={radioClass}
-                                    checked={status === option.value} onChange={() => filterBy(() => setStatus(option.value))} />
-                                <label htmlFor={`status-${option.value || 'all'}`} className={optionLabelClass}>{option.label}</label>
-                            </li>
-                        ))}
-                    </ToolbarDropdown>
-                    <ToolbarDropdown label="Filter" icon={FilterIcon} title="Choose category">
-                        {categories.map((category) => (
-                            <li key={category.id} className="flex items-center">
-                                <input id={`category-${category.id}`} type="checkbox" className={checkboxClass}
-                                    checked={!hiddenCategories.includes(category.name)} onChange={() => toggleCategory(category.name)} />
-                                <label htmlFor={`category-${category.id}`} className={optionLabelClass}>{category.name}</label>
-                            </li>
-                        ))}
-                    </ToolbarDropdown>
-                </div>
-            </TableToolbar>
-            <TableData columns={COLUMNS} rows={rows} onRowClick={(row) => setEditing(loaners.find((l) => l.id === row.id))} />
-            <TableNavigation total={filtered.length} pageSize={PAGE_SIZE} currentPage={page} onPage={setCurrentPage} />
-            <LoanerFormModal show={editing !== undefined} loaner={editing ?? null} categories={categories} onClose={() => setEditing(undefined)} />
-        </div>
-    );
+	return (
+		<>
+			<PageHeader
+				title="Loaners"
+				counts={
+					<>
+						<CountPill
+							label="Available"
+							value={count("available")}
+							dot="bg-green-500"
+						/>
+						<CountPill
+							label="Used"
+							value={count("used")}
+							dot="bg-amber-500"
+						/>
+					</>
+				}
+				action={
+					<button
+						type="button"
+						onClick={() => setEditing(null)}
+						className={primaryButtonClass}>
+						+ Add Loaner
+					</button>
+				}
+			/>
+			<div className={cardClass}>
+				<ListToolbar>
+					<div className="flex flex-col sm:flex-row gap-3">
+						<TableSearchBar
+							value={search}
+							onChange={(value) =>
+								filterBy(() => setSearch(value))
+							}
+							placeholder="Search loaners"
+						/>
+						<select
+							value={categoryId}
+							onChange={(e) =>
+								filterBy(() => setCategoryId(e.target.value))
+							}
+							aria-label="Category"
+							className={`${inputClass} sm:w-56`}>
+							<option value="">All categories</option>
+							{categories.map((category) => (
+								<option key={category.id} value={category.id}>
+									{category.name}
+									{category.active ? "" : " (inactive)"}
+								</option>
+							))}
+						</select>
+					</div>
+					<FilterPills
+						label="Status"
+						options={STATE_FILTERS}
+						value={state}
+						onSelect={(value) => filterBy(() => setState(value))}
+					/>
+				</ListToolbar>
+				<TableData
+					columns={columns(nameOf, lookups)}
+					rows={rows}
+					onRowClick={setEditing}
+					empty="No loaners found."
+				/>
+				<TableNavigation
+					total={filtered.length}
+					pageSize={PAGE_SIZE}
+					currentPage={page}
+					onPage={setCurrentPage}
+				/>
+			</div>
+			<LoanerFormModal
+				show={editing !== undefined}
+				loaner={editing ?? null}
+				categories={categories}
+				loaners={loaners}
+				groups={groups}
+				onClose={() => setEditing(undefined)}
+			/>
+		</>
+	);
 }

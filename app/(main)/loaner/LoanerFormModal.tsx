@@ -5,40 +5,52 @@ import { createLoaner, updateLoaner } from '@/actions/loaners';
 import CloseButton from '@/components/CloseButton';
 import { FormField, InputError, inputClass, labelClass } from '@/components/Form';
 import Modal from '@/components/Modal';
-import { primaryButtonClass, toolbarButtonClass } from '@/components/Table/TableToolbar';
-import { LOANER_AVAILABLE, LOANER_DISCONTINUED } from '@/lib/constants';
-import { padCustomerId } from '@/lib/format';
-import type { ActionResult, Category, FormErrors, Loaner } from '@/lib/types';
+import { primaryButtonClass, secondaryButtonClass } from '@/components/Page';
+import { loanerServiceOrder, loanerState, padDigits, SERVICE_ORDER_DIGITS } from '@/lib/format';
+import { loanerGroups } from '@/lib/loanerGroups';
+import type { ActionResult, Category, FormErrors, Loaner, LoanerGroupLink } from '@/lib/types';
 
-/** `loaner` is the loaner being edited, or null to create one. */
-type LoanerFormModalProps = { show: boolean; loaner: Loaner | null; categories: Category[]; onClose: () => void };
+/** `loaner` is the loaner being edited, or null to create one. `loaners` and `groups` are for choosing its main item. */
+type LoanerFormModalProps = {
+    show: boolean;
+    loaner: Loaner | null;
+    categories: Category[];
+    loaners: Loaner[];
+    groups: LoanerGroupLink[];
+    onClose: () => void;
+};
 
-export default function LoanerFormModal({ show, loaner, categories, onClose }: LoanerFormModalProps) {
+export default function LoanerFormModal({ show, onClose, ...props }: LoanerFormModalProps) {
     return (
         <Modal show={show} onClose={onClose} className="max-w-lg">
             {/* Keyed so the fields reset whenever a different loaner is opened. */}
-            {show && <LoanerForm key={loaner?.id ?? 'new'} loaner={loaner} categories={categories} onClose={onClose} />}
+            {show && <LoanerForm key={props.loaner?.id ?? 'new'} {...props} onClose={onClose} />}
         </Modal>
     );
 }
 
-function LoanerForm({ loaner, categories, onClose }: Omit<LoanerFormModalProps, 'show'>) {
+function LoanerForm({ loaner, categories, loaners, groups, onClose }: Omit<LoanerFormModalProps, 'show'>) {
+    const { accessoriesOf, mainOf } = loanerGroups(groups);
+    // A main item's own accessories, when this loaner is one; it can't then be an accessory itself.
+    const ownAccessories = loaner ? (accessoriesOf.get(loaner.id) ?? []).map((id) => loaners.find((l) => l.id === id)?.name).filter(Boolean) : [];
+    // Any loaner can be a main item except this one and loaners that are accessories themselves.
+    const mains = loaners.filter((l) => l.id !== loaner?.id && !mainOf.has(l.id));
     const [data, setFormData] = useState({
         name: loaner?.name ?? '',
         category_id: String(loaner?.category_id ?? categories.find((c) => c.active)?.id ?? ''),
-        status: loaner?.status ?? LOANER_AVAILABLE,
-        note: loaner?.note ?? '',
+        state: loaner ? loanerState(loaner) : 'available',
+        service_order: loaner ? loanerServiceOrder(loaner) : '',
+        main_id: String((loaner && mainOf.get(loaner.id)) ?? ''),
     });
     const [errors, setErrors] = useState<FormErrors>({});
     const [processing, startTransition] = useTransition();
     const setData = (key: keyof typeof data, value: string) => setFormData((d) => ({ ...d, [key]: value }));
 
-    // A loaner out with a customer can only stay with them or be discontinued;
-    // it is returned to the pool by completing its task.
-    const loanedTo = loaner && loaner.status !== LOANER_AVAILABLE && loaner.status !== LOANER_DISCONTINUED ? loaner.status : null;
-    const statuses = [
-        loanedTo ? { value: loanedTo, label: `Loaned to ${padCustomerId(loanedTo)}` } : { value: LOANER_AVAILABLE, label: 'Available' },
-        { value: LOANER_DISCONTINUED, label: 'Discontinued' },
+    // Saved as the loaner's status: blank, the SO# it is out with, or discontinued.
+    const states = [
+        { value: 'available', label: 'Available' },
+        { value: 'used', label: 'In use' },
+        { value: 'discontinued', label: 'Discontinued' },
     ];
 
     function submit(e: FormEvent<HTMLFormElement>) {
@@ -69,19 +81,43 @@ function LoanerForm({ loaner, categories, onClose }: Omit<LoanerFormModalProps, 
                     </select>
                     <InputError message={errors.category_id} />
                 </div>
-                <div>
-                    <label htmlFor="status" className={labelClass}>Status</label>
-                    <select id="status" className={inputClass} value={data.status} onChange={(e) => setData('status', e.target.value)}>
-                        {statuses.map((status) => <option key={status.value} value={status.value}>{status.label}</option>)}
-                    </select>
-                    <InputError message={errors.status} />
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                        <label htmlFor="state" className={labelClass}>Status</label>
+                        <select id="state" className={inputClass} value={data.state} onChange={(e) => setData('state', e.target.value)}>
+                            {states.map((state) => <option key={state.value} value={state.value}>{state.label}</option>)}
+                        </select>
+                        <InputError message={errors.state} />
+                    </div>
+                    {data.state === 'used' && (
+                        <div>
+                            <FormField id="service_order" inputMode="numeric" placeholder="Service Order" value={data.service_order} error={errors.service_order}
+                                onChange={(e) => setData('service_order', padDigits(e.target.value, SERVICE_ORDER_DIGITS))} />
+                        </div>
+                    )}
                 </div>
                 <div>
-                    <FormField id="note" type="textarea" placeholder="Note" value={data.note} onChange={(e) => setData('note', e.target.value)} maxLength={255} required={false} error={errors.note} />
+                    <label htmlFor="main_id" className={labelClass}>Accessory of</label>
+                    {ownAccessories.length > 0 ? (
+                        <p className="text-sm text-gray-600 dark:text-gray-300">Main item of a group with {ownAccessories.join(', ')}.</p>
+                    ) : (
+                        <select id="main_id" className={inputClass} value={data.main_id} onChange={(e) => setData('main_id', e.target.value)}>
+                            <option value="">None (goes out on its own)</option>
+                            {categories.map((category) => {
+                                const options = mains.filter((l) => l.category_id === category.id);
+                                return options.length > 0 && (
+                                    <optgroup key={category.id} label={category.name}>
+                                        {options.map((l) => <option key={l.id} value={l.id}>{l.name}</option>)}
+                                    </optgroup>
+                                );
+                            })}
+                        </select>
+                    )}
+                    <InputError message={errors.main_id} />
                 </div>
                 <div className="flex justify-end gap-3 pt-2">
-                    <button type="button" onClick={onClose} className={toolbarButtonClass}>Cancel</button>
-                    <button type="submit" disabled={processing} className={`${primaryButtonClass} disabled:opacity-60`}>
+                    <button type="button" onClick={onClose} className={secondaryButtonClass}>Cancel</button>
+                    <button type="submit" disabled={processing} className={primaryButtonClass}>
                         {loaner ? 'Save' : 'Add Loaner'}
                     </button>
                 </div>
