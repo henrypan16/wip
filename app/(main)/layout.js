@@ -1,4 +1,4 @@
-import MainLayout from '@/components/Layout/MainLayout';
+import MainLayout from './MainLayout';
 import { requireUser } from '@/lib/session';
 
 // Every page reads live data from the Access database.

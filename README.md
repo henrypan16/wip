@@ -28,6 +28,14 @@ bridge script and the default database path are resolved from there).
 
 Register the first account at `/register`.
 
+## Project layout
+
+- `app/**/page.tsx` – one per route (TypeScript). Server-rendered markup lives in the page itself;
+  client components used by only that page sit next to it (e.g. `app/(main)/dashboard/TaskBoard.tsx`).
+- `app/(main)/MainLayout.tsx` – the signed-in shell: navbar, sidebar and content area.
+- `components/` – only components shared by more than one page (form fields, tables, modal, status badge).
+- `actions/` – server actions; `lib/data/` – SQL for each table; `lib/types.ts` – row types.
+
 ## Configuration (`.env.local`)
 
 | Variable | Default | |
@@ -49,6 +57,7 @@ Register the first account at `/register`.
 | `Loaners.CategoryID`: TEXT → LONG, foreign key to `Category.ID`; index on `Status` | So loaners can join their category |
 | New `TaskLoaners` table (`TaskNumber` → `Tasks.Number`, `LoanerID` → `Loaners.ID`, `Note`) | Loaners lent out with a task (replaces `loaner_task`) |
 | Seed `Category`: Backpack Computers, Tower Computers, Laser Printers, Thermal Printers | Loaner sections on the dashboard |
+| Seed `Loaners`: 5 backpack PCs, 8 tower PCs, 9 MS811 laser printers, 8 GK420d/Tigra thermal printers, all available | Initial loaner pool |
 
 Existing tables, columns, data and Access queries are otherwise unchanged. When a task is
 created with loaners, the original `Tasks.Loaner` / `NoteLoaner` / `LoanerPrinter` /
@@ -69,10 +78,10 @@ Loaners are added directly in Access (`Loaners` table: `Loaner` = name, `Categor
 
 | Path | |
 | --- | --- |
-| `/`, `/dashboard` | Ready / not-ready tasks, loaner status with editable notes, task details (Ready, Complete) |
+| `/`, `/dashboard` | Pending and ready-to-go task lists, task details (Ready, Complete), loaner categories that expand to show each loaner with an editable note |
 | `/task` | All tasks: search, status filter, pagination; click a row to edit |
 | `/task/create` | New task with loaner selection; pharmacy name fills in from earlier tasks |
-| `/task/[id]/edit` | Update title, equipment, problem, note, status |
+| `/task/[id]/edit` | Update equipment, problem, note, status |
 | `/loaner` | All loaners with search, status and category filters |
 | `/receive` | Third-party PC intake; generates the inspection log text |
 | `/report/ready`, `/report/action`, `/report/repair` | Printable lists |

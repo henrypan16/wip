@@ -1,5 +1,4 @@
 import { Figtree } from "next/font/google";
-import ThemeInitializer from "@/components/ThemeInitializer";
 import "./globals.css";
 
 const figtree = Figtree({
@@ -15,11 +14,16 @@ export const metadata = {
 	},
 };
 
+// Apply the saved theme before the page paints, so dark mode doesn't flash light.
+const themeScript = `try { document.documentElement.classList.toggle("dark", localStorage.getItem("local") === "true"); } catch {}`;
+
 export default function RootLayout({ children }) {
 	return (
 		<html lang="en" className={figtree.variable} suppressHydrationWarning>
+			<head>
+				<script dangerouslySetInnerHTML={{ __html: themeScript }} />
+			</head>
 			<body className="font-sans antialiased">
-				<ThemeInitializer />
 				{children}
 			</body>
 		</html>
