@@ -7,7 +7,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "db:migrate": "node --env-file-if-exists=.env.local db/migrate.js"
+    "db:migrate": "node --env-file-if-exists=.env.local db/migrate.js",
+    "user:create": "node --env-file-if-exists=.env.local db/create-user.js"
   },
   "dependencies": {
     "bcryptjs": "3.0.3",

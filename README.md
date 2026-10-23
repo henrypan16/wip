@@ -26,7 +26,8 @@ npm run dev                    # http://localhost:3000
 For production: `npm run build` then `npm start` (always from the `web` folder, since the
 bridge script and the default database path are resolved from there).
 
-Register the first account at `/register`.
+There is no self-registration: create each login with `npm run user:create`, which prompts
+for name, email and password. The login page tells everyone else to contact their supervisor.
 
 ## Project layout
 
@@ -93,4 +94,4 @@ Loaners can be added and edited on the `/loaner` page.
 | `/receive` | Third-party PC intake; generates the inspection log text |
 | `/report/ready`, `/report/action`, `/report/repair` | Printable lists |
 | `/profile` | Name/email, password, delete account |
-| `/login`, `/register` | |
+| `/login` | |

@@ -1,9 +1,8 @@
 'use client';
 
-import Link from 'next/link';
 import { type FormEvent, useState, useTransition } from 'react';
 import { login } from '@/actions/auth';
-import { Checkbox, InputError, InputLabel, linkClass, PrimaryButton, TextInput } from '@/components/Auth';
+import { Checkbox, InputError, InputLabel, PrimaryButton, TextInput } from '@/components/Auth';
 import type { ActionResult, FormErrors } from '@/lib/types';
 
 export default function LoginForm() {
@@ -45,7 +44,7 @@ export default function LoginForm() {
             </div>
 
             <div className="flex items-center justify-end mt-4">
-                <Link href="/register" className={linkClass}>Need an account?</Link>
+                <span className="text-sm text-gray-600 dark:text-gray-400">Contact your supervisor for credentials.</span>
                 <PrimaryButton className="ml-4" disabled={processing}>Log in</PrimaryButton>
             </div>
         </form>

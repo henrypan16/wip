@@ -3,9 +3,9 @@
 import bcrypt from 'bcryptjs';
 import { headers } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { createUser, findUserByEmail } from '@/lib/data/users';
+import { findUserByEmail } from '@/lib/data/users';
 import { createSession, deleteSession } from '@/lib/session';
-import { collect, email, first, maxLength, required, text } from '@/lib/validation';
+import { collect, email, first, required, text } from '@/lib/validation';
 
 // Throttle failed logins per email + IP: 5 attempts, then wait a minute.
 const MAX_ATTEMPTS = 5;
@@ -55,27 +55,6 @@ export async function login({ email: address, password, remember }) {
 
     failedLogins.delete(key);
     await createSession(user, !!remember);
-    redirect('/dashboard');
-}
-
-export async function register({ name, email: address, password, password_confirmation }) {
-    name = text(name);
-    address = text(address);
-    const errors = collect({
-        name: first(required(name, 'name'), maxLength(name, 255, 'name')),
-        email: first(required(address, 'email'), email(address), maxLength(address, 255, 'email')),
-        password: first(
-            required(password, 'password'),
-            password?.length < 8 && 'The password must be at least 8 characters.',
-            password !== password_confirmation && 'The password confirmation does not match.',
-        ),
-    });
-    if (errors) return { errors };
-
-    if (await findUserByEmail(address)) return { errors: { email: 'The email has already been taken.' } };
-
-    const id = await createUser({ name, email: address, passwordHash: await bcrypt.hash(password, 12) });
-    await createSession({ id, name, email: address });
     redirect('/dashboard');
 }
 

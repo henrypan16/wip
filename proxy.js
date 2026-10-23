@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { SESSION_COOKIE, verify } from '@/lib/jwt';
 
 // Pages only guests should see; everything else requires a signed-in user.
-const GUEST_ONLY = ['/login', '/register'];
+const GUEST_ONLY = ['/login'];
 
 export async function proxy(request) {
     const user = await verify(request.cookies.get(SESSION_COOKIE)?.value);

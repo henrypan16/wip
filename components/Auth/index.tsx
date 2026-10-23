@@ -1,4 +1,4 @@
-// Inputs and buttons for the login, registration and profile pages,
+// Inputs and buttons for the login and profile pages,
 // matching the Laravel Breeze components the app used before.
 
 import type { ButtonHTMLAttributes, InputHTMLAttributes } from 'react';
@@ -38,5 +38,3 @@ export function SecondaryButton({ className = '', type = 'button', ...props }: B
 export function DangerButton({ className = '', ...props }: ButtonProps) {
     return <button {...props} className={`${buttonBase} bg-red-600 border-transparent text-white hover:bg-red-500 active:bg-red-700 focus:ring-red-500 ${className}`} />;
 }
-
-export const linkClass = 'underline text-sm text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 rounded-md focus:outline-hidden focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800';
